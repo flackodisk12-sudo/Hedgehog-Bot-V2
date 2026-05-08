@@ -6,11 +6,11 @@ const { getPrefix } = global.utils;
 // 🌸 CADRE STYLE
 function neo(text) {
 	return `
-🌸 ══━━✥🌺✥━━══ 🌸
+•┈┈┈••✦ ♡ ✦••┈┈┈•
 
-✨ ${text}
+🌸 ${text}
 
-🌸 ══━━✥🌺✥━━══ 🌸
+•┈┈┈••✦ ♡ ✦••┈┈┈•
 `;
 }
 
@@ -31,17 +31,24 @@ module.exports = {
 		const prefix = getPrefix(threadID);
 		const botID = api.getCurrentUserID();
 
+		// 🔥 NOM DU BOT
+		let botName = "BOT";
+		try {
+			const botInfo = await api.getUserInfo(botID);
+			botName = botInfo[botID]?.name || "BOT";
+		} catch {}
+
 		// 🤖 BOT JOIN
 		if (addedParticipants.some(u => u.userFbId === botID)) {
 			return api.sendMessage(
 				neo(
-`🤖 SYSTÈME CONNECTÉ
+`🤖 BOT ACTIVÉ
 
-⚡ Bot activé avec succès
+👑 ${botName} est maintenant prêt
 💠 Préfixe : ${prefix}
 
-👑 Statut : OPÉRATIONNEL
-🔥 Prêt à servir le groupe`
+✨ Mode : Actif
+🔥 Disponible pour vos commandes`
 				),
 				threadID
 			);
@@ -77,6 +84,8 @@ module.exports = {
 
 🏷️ Groupe : ${groupName}
 👥 Membres : ${memberCount}
+
+🤖 Bot : ${botName}
 
 💬 Respect • Fun • Bonne ambiance
 🔥 Tu es maintenant membre officiel
