@@ -4,96 +4,90 @@ const mediaTypes = ["photo", 'png', "animated_image", "video", "audio"];
 module.exports = {
 	config: {
 		name: "callad",
-		version: "1.7",
-		author: "NTKhang",
+		version: "1.8",
+		author: "NTKhang x Célestin 🔥",
 		countDown: 5,
 		role: 0,
-		description: {
-			vi: "gửi báo cáo, góp ý, báo lỗi,... của bạn về admin bot",
-			en: "send report, feedback, bug,... to admin bot"
-		},
-		category: "contacts admin",
-		guide: {
-			en: "{pn} <message>"
-		}
+		category: "contacts admin"
 	},
 
 	langs: {
 		en: {
 			missingMessage:
-`࿇ ══━━✥👑✥━━══ ࿇
-⚜️ MESSAGE MANQUANT
+`✧ ▬▭▬ ▬▭▬ ✦✧✦ ▬▭▬ ▬▭▬ ✧
+⚜️ 𝑴𝑬𝑺𝑺𝑨𝑮𝑬 𝑴𝑨𝑵𝑸𝑼𝑨𝑵𝑻
 
-💬 Écris un message à envoyer au ROI (admin)
-࿇ ══━━✥👑✥━━══ ࿇`,
+💬 𝑬́𝒄𝒓𝒊𝒔 𝒖𝒏 𝒎𝒆𝒔𝒔𝒂𝒈𝒆 𝒑𝒐𝒖𝒓 𝒍𝒆 𝑹𝑶𝑰 👑
+✧ ▬▭▬ ▬▭▬ ✦✧✦ ▬▭▬ ▬▭▬ ✧`,
 
 			sendByGroup:
-`\n🏰 Provenance : %1\n🆔 ID Groupe : %2`,
+`\n🏰 𝑮𝒓𝒐𝒖𝒑𝒆 : %1\n🆔 𝑰𝑫 : %2`,
 
 			sendByUser:
-`\n👤 Message envoyé en privé`,
+`\n👤 𝑴𝒆𝒔𝒔𝒂𝒈𝒆 𝒑𝒓𝒊𝒗𝒆́`,
 
 			content:
-`\n\n📜 CONTENU ROYAL
+`\n\n📜 𝑪𝑶𝑵𝑻𝑬𝑵𝑼
 ═══════════════════
 %1
 ═══════════════════
-💬 Réponds à ce message pour répondre à l’utilisateur`,
+💬 𝑹𝒆́𝒑𝒐𝒏𝒅𝒔 𝒊𝒄𝒊`,
 
 			success:
-`࿇ ══━━✥👑✥━━══ ࿇
-✅ TRANSMISSION RÉUSSIE
+`✧ ▬▭▬ ▬▭▬ ✦✧✦ ▬▭▬ ▬▭▬ ✧
+✅ 𝑻𝑹𝑨𝑵𝑺𝑴𝑰𝑺𝑺𝑰𝑶𝑵 𝑹𝑬́𝑼𝑺𝑺𝑰𝑬
 
-📡 Message envoyé à %1 admin(s)
+📡 𝑬𝒏𝒗𝒐𝒚𝒆́ 𝒂̀ %1 𝒂𝒅𝒎𝒊𝒏(𝒔)
 %2
-࿇ ══━━✥👑✥━━══ ࿇`,
+✧ ▬▭▬ ▬▭▬ ✦✧✦ ▬▭▬ ▬▭▬ ✧`,
 
 			failed:
-`࿇ ══━━✥❌✥━━══ ࿇
-⚠️ ÉCHEC PARTIEL
+`✧ ▬▭▬ ▬▭▬ ✦✧✦ ▬▭▬ ▬▭▬ ✧
+⚠️ 𝑬́𝑪𝑯𝑬𝑪 𝑷𝑨𝑹𝑻𝑰𝑬𝑳
 
-❌ Impossible d’envoyer à %1 admin(s)
+❌ %1 𝒆́𝒄𝒉𝒆𝒄(𝒔)
 %2
-📌 Vérifie la console
-࿇ ══━━✥❌✥━━══ ࿇`,
+📌 𝑪𝒐𝒏𝒔𝒐𝒍𝒆
+✧ ▬▭▬ ▬▭▬ ✦✧✦ ▬▭▬ ▬▭▬ ✧`,
 
 			reply:
-`࿇ ══━━✥👑✥━━══ ࿇
-📩 RÉPONSE DU ROI %1
+`✧ ▬▭▬ ▬▭▬ ✦✧✦ ▬▭▬ ▬▭▬ ✧
+📩 𝑹𝑬́𝑷𝑶𝑵𝑺𝑬 𝑫𝑼 𝑹𝑶𝑰 👑 %1
 ═══════════════════
 %2
 ═══════════════════
-💬 Réponds pour continuer la discussion
-࿇ ══━━✥👑✥━━══ ࿇`,
+💬 𝑪𝒐𝒏𝒕𝒊𝒏𝒖𝒆
+✧ ▬▭▬ ▬▭▬ ✦✧✦ ▬▭▬ ▬▭▬ ✧`,
 
 			replySuccess:
-`࿇ ══━━✥👑✥━━══ ࿇
-✅ MESSAGE ENVOYÉ AU ROI
-࿇ ══━━✥👑✥━━══ ࿇`,
+`✧ ▬▭▬ ▬▭▬ ✦✧✦ ▬▭▬ ▬▭▬ ✧
+✅ 𝑬𝑵𝑽𝑶𝒀𝑬́ 𝑨𝑼 𝑹𝑶𝑰 👑
+✧ ▬▭▬ ▬▭▬ ✦✧✦ ▬▭▬ ▬▭▬ ✧`,
 
 			feedback:
-`࿇ ══━━✥📜✥━━══ ࿇
-📝 MESSAGE DU SUJET %1
+`✧ ▬▭▬ ▬▭▬ ✦✧✦ ▬▭▬ ▬▭▬ ✧
+📝 𝑴𝑬𝑺𝑺𝑨𝑮𝑬 𝑼𝑻𝑰𝑳𝑰𝑺𝑨𝑻𝑬𝑼𝑹
 
-🆔 ID : %2%3
+👤 %1
+🆔 %2%3
 
 ═══════════════════
 %4
 ═══════════════════
-💬 Réponds pour envoyer une réponse
-࿇ ══━━✥📜✥━━══ ࿇`,
+💬 𝑹𝒆́𝒑𝒐𝒏𝒅𝒔
+✧ ▬▭▬ ▬▭▬ ✦✧✦ ▬▭▬ ▬▭▬ ✧`,
 
 			replyUserSuccess:
-`࿇ ══━━✥👑✥━━══ ࿇
-✅ RÉPONSE ENVOYÉE AU SUJET
-࿇ ══━━✥👑✥━━══ ࿇`,
+`✧ ▬▭▬ ▬▭▬ ✦✧✦ ▬▭▬ ▬▭▬ ✧
+✅ 𝑹𝑬́𝑷𝑶𝑵𝑺𝑬 𝑬𝑵𝑽𝑶𝒀𝑬́𝑬
+✧ ▬▭▬ ▬▭▬ ✦✧✦ ▬▭▬ ▬▭▬ ✧`,
 
 			noAdmin:
-`࿇ ══━━✥❌✥━━══ ࿇
-🚫 AUCUN ADMIN
+`✧ ▬▭▬ ▬▭▬ ✦✧✦ ▬▭▬ ▬▭▬ ✧
+🚫 𝑨𝑼𝑪𝑼𝑵 𝑹𝑶𝑰
 
-⚠️ Aucun ROI n’est défini pour ce bot
-࿇ ══━━✥❌✥━━══ ࿇`
+⚠️ 𝑨𝒅𝒎𝒊𝒏 𝒊𝒏𝒅𝒆́𝒇𝒊𝒏𝒊
+✧ ▬▭▬ ▬▭▬ ✦✧✦ ▬▭▬ ▬▭▬ ✧`
 		}
 	},
 
@@ -110,12 +104,12 @@ module.exports = {
 		const senderName = await usersData.getName(senderID);
 
 		const msg =
-`࿇ ══━━✥👑✥━━══ ࿇
-📨 APPEL AU ROI
-࿇ ══━━✥👑✥━━══ ࿇
+`✧ ▬▭▬ ▬▭▬ ✦✧✦ ▬▭▬ ▬▭▬ ✧
+📨 𝑨𝑷𝑷𝑬𝑳 𝑨𝑼 𝑹𝑶𝑰 👑
+✧ ▬▭▬ ▬▭▬ ✦✧✦ ▬▭▬ ▬▭▬ ✧
 
-👤 Nom : ${senderName}
-🆔 ID : ${senderID}`
+👤 ${senderName}
+🆔 ${senderID}`
 			+ (isGroup
 				? getLang("sendByGroup", (await threadsData.get(threadID)).threadName, threadID)
 				: getLang("sendByUser"));
