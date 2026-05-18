@@ -5,8 +5,8 @@ const path = require("path");
 module.exports = {
   config: {
     name: "welcome",
-    version: "2.1",
-    author: "Saimx69x + Celestin",
+    version: "2.3",
+    author: "Saimx69x + Celestin 😎",
     category: "events"
   },
 
@@ -23,23 +23,40 @@ module.exports = {
 
     // 🤖 SI C’EST LE BOT QUI EST AJOUTÉ → PRÉSENTATION
     if (newUsers.some(u => u.userFbId === botID)) {
+
+      // 🔥 NOM DU BOT DEPUIS CONFIG
+      let botName = "BOT";
+      if (global.GoatBot && global.GoatBot.config && global.GoatBot.config.nickNameBot) {
+        botName = global.GoatBot.config.nickNameBot;
+      }
+
+      try {
+        await api.changeNickname(`✧ ${botName} ✧`, threadID, botID);
+      } catch (e) {
+        console.log("Erreur rename bot:", e);
+      }
+
       return api.sendMessage(
-`━━━━━━ ◦ ❖ ◦ ━━━━━━
-🤖 𝐁𝐎𝐓 𝐂𝐎𝐍𝐍𝐄𝐂𝐓𝐄́
+`✧ ▬▭▬ ▬▭▬ ✦✧✦ ▬▭▬ ▬▭▬ ✧
+✧ ▬▭▬ ▬▭▬ ✦✧✦ ▬▭▬ ▬▭▬ ✧
 
-👋 Salut tout le monde !
-Je viens d'être ajouté dans ce groupe 😎
+🤖 𝑩𝑶𝑻 𝑪𝑶𝑵𝑵𝑬𝑪𝑻𝑬́
 
-✨ Je suis votre assistant :
-📌 Commandes
-🎮 Jeux
-🤖 IA
-⚙️ Outils utiles
+👋 𝑺𝒂𝒍𝒖𝒕 𝒕𝒐𝒖𝒕 𝒍𝒆 𝒎𝒐𝒏𝒅𝒆 !
+𝑱𝒆 𝒗𝒊𝒆𝒏𝒔 𝒅'𝒆̂𝒕𝒓𝒆 𝒂𝒋𝒐𝒖𝒕𝒆́ 😎
 
-💡 Tape "help" pour voir mes commandes
+✨ 𝑱𝒆 𝒔𝒖𝒊𝒔 𝒗𝒐𝒕𝒓𝒆 𝒂𝒔𝒔𝒊𝒔𝒕𝒂𝒏𝒕 :
+📌 𝑪𝒐𝒎𝒎𝒂𝒏𝒅𝒆𝒔
+🎮 𝑱𝒆𝒖𝒙
+🤖 𝑰𝑨
+⚙️ 𝑶𝒖𝒕𝒊𝒍𝒔
 
-❤️ Merci de m'avoir ajouté !
-━━━━━━ ◦ ❖ ◦ ━━━━━━`,
+💡 𝑻𝒂𝒑𝒆 "help"
+
+❤️ 𝑴𝒆𝒓𝒄𝒊 𝒅𝒆 𝒎'𝒂𝒗𝒐𝒊𝒓 𝒂𝒋𝒐𝒖𝒕𝒆́
+
+✧ ▬▭▬ ▬▭▬ ✦✧✦ ▬▭▬ ▬▭▬ ✧
+✧ ▬▭▬ ▬▭▬ ✦✧✦ ▬▭▬ ▬▭▬ ✧`,
         threadID
       );
     }
@@ -68,20 +85,24 @@ Je viens d'être ajouté dans ce groupe 😎
 
         await api.sendMessage({
           body:
-`━━━━━━ ◦ ❖ ◦ ━━━━━━
-🎉 𝐁𝐈𝐄𝐍𝐕𝐄𝐍𝐔𝐄 ${fullName} !
+`✧ ▬▭▬ ▬▭▬ ✦✧✦ ▬▭▬ ▬▭▬ ✧
+✧ ▬▭▬ ▬▭▬ ✦✧✦ ▬▭▬ ▬▭▬ ✧
 
-💬 Tu viens de rejoindre :
+🎉 𝑩𝑰𝑬𝑵𝑽𝑬𝑵𝑼𝑬 ${fullName} !
+
+💬 𝑻𝒖 𝒗𝒊𝒆𝒏𝒔 𝒅𝒆 𝒓𝒆𝒋𝒐𝒊𝒏𝒅𝒓𝒆 :
 📌 ${groupName}
 
-👥 Tu es le membre n° ${memberCount}
+👥 𝑴𝒆𝒎𝒃𝒓𝒆 𝒏° ${memberCount}
 
-✨ Nous sommes ravis de t'accueillir ici !
-🤝 N'hésite pas à discuter et t'amuser avec nous
+✨ 𝑶𝒏 𝒆𝒔𝒕 𝒄𝒐𝒏𝒕𝒆𝒏𝒕 𝒅𝒆 𝒕’𝒂𝒗𝒐𝒊𝒓 𝒊𝒄𝒊
+🤝 𝑨𝒎𝒖𝒔𝒆-𝒕𝒐𝒊 𝒃𝒊𝒆𝒏 !
 
 ━━━━━━━━━━━━━━━━
 📅 ${timeStr}
-━━━━━━ ◦ ❖ ◦ ━━━━━━`,
+
+✧ ▬▭▬ ▬▭▬ ✦✧✦ ▬▭▬ ▬▭▬ ✧
+✧ ▬▭▬ ▬▭▬ ✦✧✦ ▬▭▬ ▬▭▬ ✧`,
           attachment: fs.createReadStream(imagePath),
           mentions: [{ tag: fullName, id: userId }]
         }, threadID);
