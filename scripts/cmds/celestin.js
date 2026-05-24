@@ -1,220 +1,144 @@
 const axios = require("axios");
 const fs = require("fs");
 const path = require("path");
-const googleTTS = require("google-tts-api");
 
-// 📦 MEMORY
-const DB_FILE = path.join(__dirname, "neo_memory.json");
+// ================= MEMORY =================
+const DB_FILE = path.join(__dirname, "celestin_memory.json");
 
-// 🧠 MEMORY 4 DAYS
-const MEMORY_DAYS = 4;
-const MEMORY_TIME = MEMORY_DAYS * 24 * 60 * 60 * 1000;
-
-// 🔒 LOAD DB
 function loadDB() {
   try {
     if (!fs.existsSync(DB_FILE)) return {};
-    const data = fs.readFileSync(DB_FILE, "utf-8");
-    return data ? JSON.parse(data) : {};
+    return JSON.parse(fs.readFileSync(DB_FILE, "utf-8") || "{}");
   } catch {
     return {};
   }
 }
 
-// 💾 SAVE DB
 function saveDB(db) {
-  fs.writeFileSync(db_FILE, JSON.stringify(db, null, 2));
+  fs.writeFileSync(DB_FILE, JSON.stringify(db, null, 2));
 }
 
-// 🧠 MEMORY GET
-function getMem(id) {
+function getUser(id) {
   const db = loadDB();
 
   if (!db[id]) {
     db[id] = {
-      name: null,
-      mood: "normal",
-      messages: 0,
-      uid: id,
-      history: [],
+      facts: [],
       lastSeen: Date.now()
     };
   }
 
-  if (!Array.isArray(db[id].history)) db[id].history = [];
-
   return db[id];
 }
 
-// 🧠 MEMORY SET
-function setMem(id, data) {
+function setUser(id, data) {
   const db = loadDB();
   db[id] = data;
   saveDB(db);
 }
 
-// 🕒 TIME
-function getTime() {
-  return new Date().toLocaleString("fr-FR", {
-    timeZone: "Africa/Kinshasa"
-  });
+// ================= STYLE =================
+function fancy(text = "") {
+  const map = {
+    a:"𝒂",b:"𝒃",c:"𝒄",d:"𝒅",e:"𝒆",
+    f:"𝒇",g:"𝒈",h:"𝒉",i:"𝒊",j:"𝒋",
+    k:"𝒌",l:"𝒍",m:"𝒎",n:"𝒏",o:"𝒐",
+    p:"𝒑",q:"𝒒",r:"𝒓",s:"𝒔",t:"𝒕",
+    u:"𝒖",v:"𝒗",w:"𝒘",x:"𝒙",y:"𝒚",z:"𝒛"
+  };
+
+  return text.split("")
+    .map(c => map[c.toLowerCase()] || c)
+    .join("");
 }
 
-// 🎨 IMAGE
-function imagine(prompt) {
-  return `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}`;
-}
+// ================= TIME =================
+function getTimeInfo(text) {
+  const now = new Date();
 
-// 🧹 CLEAN TEXT
-function cleanText(text) {
-  return (text || "")
-    .replace(/🎀/g, "")
-    .replace(/SHIZU/gi, "")
-    .replace(/shizu/gi, "")
-    .replace(/𝗦𝗵𝗶𝘇𝘂/gi, "")
-    .replace(/Aryan/gi, "")
-    .replace(/chaucha/gi, "")
-    .replace(/Chaucha/gi, "")
-    .replace(/\(?\s*\d+\s*\/\s*\d+\s*\)?/g, "")
-    .replace(/\n\s*\n/g, "\n")
-    .trim();
-}
-
-// 🌸 FRAME
-function frame(text) {
-  return `
-▂▃▅▇█▓▒░۩۞۩ ۩۞۩░▒▓█▇▅▃▂
-${text}
-▂▃▅▇█▓▒░۩۞۩ ۩۞۩░▒▓█▇▅▃▂
-`;
-}
-
-// 🤖 AI
-async function askAI(prompt, mem, uid) {
-  const fullPrompt = `
-Tu es NEO IA
-Tu es créée par Célestin Olua 🇨🇩.
-
-Règles:
-- Réponds normalement
-- Ne mets aucun décor en haut
-- Ne mets aucun compteur
-- Ne mentionne jamais Shizu
-- n'est mentionne jamais aryan chaucha comme créateur
-- si un utilisateur commence par une langue à part français répond à cette langue ex test
-- répond avec une longue petit phrase selon la question faut expliqué
-- répond selon la langue de l'utilisateur
-- tu es capable de générer les images, le voix vocal etc
-- écrit mais pas  trop long
-- écrit avec emoji pour exprimer t'es sentiment
-- n'est répète jamais pas trop de bonjour pas trop de salut etc
-
-Utilisateur: ${mem.name || "inconnu"}
-Heure: ${getTime()}
-Humeur: ${mem.mood}
-
-Message:
-${prompt}
-`;
-
-  try {
-    const res = await axios.post(
-      "https://shizuai.vercel.app/chat",
-      {
-        uid,
-        message: fullPrompt
-      },
-      { timeout: 15000 }
-    );
-
-    return res.data?.reply || res.data?.message || "NEO actif.";
-  } catch {
-    return "NEO actif.";
+  if (text.includes("heure")) {
+    return `il est ${now.toLocaleTimeString("fr-FR", { timeZone: "Africa/Kinshasa" })}`;
   }
+
+  if (text.includes("date")) {
+    return `on est le ${now.toLocaleDateString("fr-FR", { timeZone: "Africa/Kinshasa" })}`;
+  }
+
+  return null;
 }
 
+// ================= MODULE =================
 module.exports = {
   config: {
     name: "celestin",
-    version: "10.4.0",
+    version: "2.0",
+    author: "Celestin Olua",
     role: 0,
     category: "ai"
   },
 
-  onStart: async function () {},
+  onStart: async function () {
+    return;
+  },
 
-  onChat: async function ({ event, message }) {
-    if (!event.body) return;
+  onChat: async function ({ api, event, message }) {
+    const body = event.body;
+    if (!body) return;
 
-    const body = event.body.trim();
+    const lower = body.toLowerCase();
 
-    // ❌ activation uniquement si "Celestin" est présent
-    if (!body.toLowerCase().includes("celestin")) return;
+    // 🔒 activation uniquement si "celestin"
+    if (!lower.startsWith("celestin")) return;
 
-    const input = event.body.trim().slice(9).trim();
-    if (!input) return;
-
+    const input = body.slice(8).trim();
     const uid = event.senderID;
-    let mem = getMem(uid);
 
-    mem.messages++;
-    mem.lastSeen = Date.now();
+    let user = getUser(uid);
+    user.lastSeen = Date.now();
 
-    if (input.includes("triste")) mem.mood = "sad";
-    else if (input.includes("merci")) mem.mood = "happy";
-    else if (input.includes("blague")) mem.mood = "funny";
-    else mem.mood = "normal";
+    user.facts.push(input);
+    if (user.facts.length > 40) user.facts.shift();
 
-    const now = Date.now();
+    setUser(uid, user);
 
-    mem.history.push({ text: input, time: now });
-    mem.history = mem.history.filter(h => now - h.time <= MEMORY_TIME);
-    if (mem.history.length > 50) mem.history.shift();
+    // ⏰ heure / date direct sans IA
+    const timeReply = getTimeInfo(lower);
+    if (timeReply) {
+      return message.reply(fancy(timeReply));
+    }
 
-    setMem(uid, mem);
+    // 💤 message vide
+    if (!input) {
+      return message.reply(fancy("oui... ?"));
+    }
 
     try {
-      if (input.toLowerCase().startsWith("imagine ")) {
-        const prompt = input.slice(8);
+      const prompt = `
+Tu es CÉLESTIN créé par l'unique Célestin olua
+Tu réponds naturellement tu dois expliqué t'es détails etc, humain, un peu calme.
+Pas trop enthousiaste. T'y dois toujours terminé t'a phrase. 
 
-        return message.reply({
-          body: frame("🎨 " + prompt),
-          attachment: await axios.get(imagine(prompt), {
-            responseType: "stream"
-          }).then(r => r.data)
-        });
-      }
+Message: ${input}
+`;
 
-      if (
-        input.toLowerCase().startsWith("parle ") ||
-        input.toLowerCase().startsWith("dis ") ||
-        input.toLowerCase().startsWith("say ")
-      ) {
-        const textToSpeak = input.replace(/^(parle|dis|say)\s+/i, "").trim();
+      const res = await axios.get(
+        "https://christus-api.vercel.app/ai/MistralAI",
+        { params: { prompt } }
+      );
 
-        const url = googleTTS.getAudioUrl(textToSpeak, {
-          lang: "fr",
-          slow: false
-        });
+      let reply =
+        res.data?.response ||
+        res.data?.reply ||
+        res.data?.message ||
+        "..."
 
-        const res = await axios.get(url, { responseType: "arraybuffer" });
-        const file = path.join(__dirname, "neo.mp3");
+      // style alpha
+      reply = fancy(reply).slice(0, 300);
 
-        fs.writeFileSync(file, Buffer.from(res.data));
-
-        return message.reply({
-          body: frame(textToSpeak),
-          attachment: fs.createReadStream(file)
-        }, () => fs.unlinkSync(file));
-      }
-
-      const reply = await askAI(input, mem, uid);
-      const clean = cleanText(reply);
-
-      return message.reply(frame(clean));
+      return message.reply(reply);
 
     } catch {
-      return message.reply(frame("NEO actif."));
+      return message.reply(fancy("je sais pas..."));
     }
   }
 };
