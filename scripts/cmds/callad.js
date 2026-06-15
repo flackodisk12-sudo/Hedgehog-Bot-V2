@@ -82,7 +82,7 @@ async function generateCallAdminCanvas(userId, userName, title, subTitle, messag
 		let testLine = line + words[n] + ' ';
 		let metrics = ctx.measureText(testLine);
 		if (metrics.width > maxWidth && n > 0) {
-			if (y > 360) { // Si le texte dépasse le cadre bas, on arrête
+			if (y > 360) {
 				ctx.fillText(line.trim() + "...", 400, y);
 				line = '';
 				break;
@@ -106,7 +106,7 @@ async function generateCallAdminCanvas(userId, userName, title, subTitle, messag
 module.exports = {
 	config: {
 		name: "callad",
-		version: "2.0",
+		version: "2.1",
 		author: "NTKhang x Célestin 🔥 (Canvas Edition)",
 		countDown: 5,
 		role: 0,
@@ -116,13 +116,13 @@ module.exports = {
 	langs: {
 		en: {
 			missingMessage: `✧ ▬▭▬ ▬▭▬ ✦✧✦ ▬▭▬ ▬▭▬ ✧\n⚜️ 𝑴𝑬𝑺𝑺𝑨𝑮𝑬 𝑴𝑨𝑵𝑸𝑼𝑨𝑵𝑻\n\n💬 𝑬́𝒄𝒓𝒊𝒔 𝒖𝒏 𝒎𝒆𝒔𝒔𝒂𝒈𝒆 𝒑𝒐𝒖𝒓 𝒍𝒆 𝑹𝑶𝑰 👑\n✧ ▬▭▬ ▬▭▬ ✦✧✦ ▬▭▬ ▬▭▬ ✧`,
-			sendByGroup: `\n城堡 𝑮𝒓𝒐𝒖𝒑𝒆 : %1\n🆔 𝑰𝑫 : %2`,
+			sendByGroup: `\n🏰 𝑮𝒓𝒐𝒖𝒑𝒆 : %1\n🆔 𝑰𝑫 : %2`,
 			sendByUser: `\n👤 𝑴𝒆𝒔𝒔𝒂𝒈𝒆 𝒑𝒓𝒊𝒗𝒆́`,
 			content: `\n\n📜 𝑪𝑶𝑵𝑻𝑬𝑵𝑼\n═══════════════════\n%1\n═══════════════════\n💬 𝑹𝒆́𝒑𝒐𝒏𝒅𝒔 𝒊𝒄𝒊`,
 			success: `✧ ▬▭▬ ▬▭▬ ✦✧✦ ▬▭▬ ▬▭▬ ✧\n✅ 𝑻𝑹𝑨𝑵𝑺𝑴𝑰𝑺𝑺𝑰𝑶𝑵 𝑹𝑬́𝑼𝑺𝑺𝑰𝑬\n\n📡 𝑬𝒏𝒗𝒐𝒚𝒆́ 𝒂̀ %1 𝒂𝒅𝒎𝒊𝒏(𝒔)\n%2\n✧ ▬▭▬ ▬▭▬ ✦✧✦ ▬▭▬ ▬▭▬ ✧`,
 			failed: `✧ ▬▭▬ ▬▭▬ ✦✧✦ ▬▭▬ ▬▭▬ ✧\n⚠️ 𝑬́𝑪𝑯𝑬𝑪 𝑷𝑨𝑹𝑻𝑰𝑬𝑳\n\n❌ %1 𝒆́𝒄𝒉𝒆𝒄(𝒔)\n%2\n📌 𝑪𝒐𝒏𝒔𝒐𝒍𝒆\n✧ ▬▭▬ ▬▭▬ ✦✧✦ ▬▭▬ ▬▭▬ ✧`,
 			reply: `✧ ▬▭▬ ▬▭▬ ✦✧✦ ▬▭▬ ▬▭▬ ✧\n📩 𝑹𝑬́𝑷𝑶𝑵𝑺𝑬 𝑫𝑼 𝑹𝑶𝑰 👑 %1\n═══════════════════\n%2\n═══════════════════\n💬 𝑪𝒐𝒏𝒕𝒊𝒏𝒖𝒆\n✧ ▬▭▬ ▬▭▬ ✦✧✦ ▬▭▬ ▬▭▬ ✧`,
-			replySuccess: `✧ ▬▭▬ ▬▭▬ ✦✧✦ ▬▭▬ ▬▭▬ ✧\n✅ 𝑬module 𝑬𝑵𝑽𝑶𝒀𝑬́ 𝑨𝑼 𝑹𝑶𝑰 👑\n✧ ▬▭▬ ▬▭▬ ✦✧✦ ▬▭▬ ▬▭▬ ✧`,
+			replySuccess: `✧ ▬▭▬ ▬▭▬ ✦✧✦ ▬▭▬ ▬▭▬ ✧\n✅ 𝑴𝑬𝑺𝑺𝑨𝑮𝑬 𝑬𝑵𝑽𝑶𝒀𝑬́ 𝑨𝑼 𝑹𝑶𝑰 👑\n✧ ▬▭▬ ▬▭▬ ✦✧✦ ▬▭▬ ▬▭▬ ✧`,
 			feedback: `✧ ▬▭▬ ▬▭▬ ✦✧✦ ▬▭▬ ▬▭▬ ✧\n📝 𝑴𝑬𝑺𝑺𝑨𝑮𝑬 𝑼𝑻𝑰𝑳𝑰𝑺𝑨𝑻𝑬𝑼𝑹\n\n👤 %1\n🆔 %2%3\n\n═══════════════════\n%4\n═══════════════════\n💬 𝑹𝒆́𝒑𝒐𝒏𝒅𝒔\n✧ ▬▭▬ ▬▭▬ ✦✧✦ ▬▭▬ ▬▭▬ ✧`,
 			replyUserSuccess: `✧ ▬▭▬ ▬▭▬ ✦✧✦ ▬▭▬ ▬▭▬ ✧\n✅ 𝑹𝑬́𝑷𝑶𝑵𝑺𝑬 𝑬𝑵𝑽𝑶𝒀𝑬́𝑬\n✧ ▬▭▬ ▬▭▬ ✦✧✦ ▬▭▬ ▬▭▬ ✧`,
 			noAdmin: `✧ ▬▭▬ ▬▭▬ ✦✧✦ ▬▭▬ ▬▭▬ ✧\n🚫 𝑨𝑼𝑪𝑼𝑵 𝑹𝑶𝑰\n\n⚠️ 𝑨𝒅𝒎𝒊𝒏 𝒊𝒏𝒅𝒆́𝒇𝒊𝒏𝒊\n✧ ▬▭▬ ▬▭▬ ✦✧✦ ▬▭▬ ▬▭▬ ✧`
@@ -141,7 +141,6 @@ module.exports = {
 		const groupInfo = isGroup ? await threadsData.get(threadID) : null;
 		const threadName = groupInfo ? groupInfo.threadName : "Message Privé";
 
-		// Génération de l'image Canvas pour l'administrateur
 		const textContent = args.join(" ");
 		const subTitleText = isGroup ? `🏰 𝑮𝒓𝒐𝒖𝒑𝒆 : ${threadName}` : `👤 Via Message Privé`;
 		const imagePath = await generateCallAdminCanvas(senderID, senderName, "📨 𝑨𝑷𝑷𝑬𝑳 𝑨𝑼 𝑹𝑶𝑰 👑", subTitleText, textContent, "#ffb703");
@@ -186,7 +185,6 @@ module.exports = {
 			}
 		}
 
-		// Nettoyage de l'image de cache après l'envoi aux admins
 		if (fs.existsSync(imagePath)) fs.unlinkSync(imagePath);
 
 		let msg2 = "";
@@ -208,9 +206,10 @@ module.exports = {
 		const { isGroup } = event;
 		const textReply = args.join(" ");
 
+		if (!textReply) return message.reply("⚠️ Écris un texte pour répondre.");
+
 		switch (type) {
 			case "userCallAdmin": {
-				// Réponse de l'admin vers l'utilisateur (Thème Royal Cyan / Bleu Pro)
 				const imagePath = await generateCallAdminCanvas(event.senderID, senderName, "📩 𝑹𝑬́𝑷𝑶𝑵𝑺𝑬 𝑫𝑼 𝑹𝑶𝑰 👑", "👑 Administrateur Global", textReply, "#00b4d8");
 
 				const formMessage = {
@@ -224,7 +223,7 @@ module.exports = {
 
 				api.sendMessage(formMessage, threadID, (err, info) => {
 					if (fs.existsSync(imagePath)) fs.unlinkSync(imagePath);
-					if (err) return message.err(err);
+					if (err) return message.reply("❌ Impossible de transmettre la réponse.");
 
 					message.reply(getLang("replyUserSuccess"));
 
@@ -240,12 +239,12 @@ module.exports = {
 			}
 
 			case "adminReply": {
-				// Retour de l'utilisateur vers l'admin (Thème Vert/Neon Feedback)
 				let sendByGroup = "";
 				let subTitleText = "👤 Via Message Privé";
 
 				if (isGroup) {
-					const { threadName } = await api.getThreadInfo(event.threadID);
+					const groupInfo = await api.getThreadInfo(event.threadID).catch(() => null);
+					const threadName = groupInfo ? groupInfo.threadName : "Groupe Inconnu";
 					sendByGroup = getLang("sendByGroup", threadName, event.threadID);
 					subTitleText = `🏰 𝑮𝒓𝒐𝒖𝒑𝒆 : ${threadName}`;
 				}
@@ -263,7 +262,7 @@ module.exports = {
 
 				api.sendMessage(formMessage, threadID, (err, info) => {
 					if (fs.existsSync(imagePath)) fs.unlinkSync(imagePath);
-					if (err) return message.err(err);
+					if (err) return message.reply("❌ Impossible de transmettre le feedback.");
 
 					message.reply(getLang("replySuccess"));
 
