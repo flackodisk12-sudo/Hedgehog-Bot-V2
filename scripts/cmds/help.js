@@ -4,104 +4,111 @@ const path = require('path');
 
 const { commands, aliases } = global.GoatBot;
 
-// --- Fonction pour transformer un texte en style 𝑨𝒁 ---
-function toAZStyle(text) {
-  const azMap = {
-    A:'𝑨', B:'𝑩', C:'𝑪', D:'𝑫', E:'𝑬', F:'𝑭', G:'𝑮', H:'𝑯', I:'𝑰', J:'𝑱',
-    K:'𝑲', L:'𝑳', M:'𝑴', N:'𝑵', O:'𝑶', P:'𝑷', Q:'𝑸', R:'𝑹', S:'𝑺', T:'𝑻',
-    U:'𝑼', V:'𝑽', W:'𝑾', X:'𝑿', Y:'𝒀', Z:'𝒁',
-    a:'𝒂', b:'𝒃', c:'𝒄', d:'𝒅', e:'𝒆', f:'𝒇', g:'𝒈', h:'𝒉', i:'𝒊', j:'𝒋',
-    k:'𝒌', l:'𝒍', m:'𝒎', n:'𝒏', o:'𝒐', p:'𝒑', q:'𝒒', r:'𝒓', s:'𝒔', t:'𝒕',
-    u:'𝒖', v:'𝒗', w:'𝒘', x:'𝒙', y:'𝒚', z:'𝒛',
-    ' ':' '
+function toSmallCaps(text) {
+  const smallCapsMap = {
+    a:'ᴀ', b:'ʙ', c:'ᴄ', d:'ᴅ', e:'ᴇ', f:'ꜰ', g:'ɢ', h:'ʜ', i:'ɪ', j:'ᴊ',
+    k:'ᴋ', l:'ʟ', m:'ᴍ', n:'ɴ', o:'ᴏ', p:'ᴘ', q:'ǫ', r:'ʀ', s:'ѕ', t:'ᴛ',
+    u:'ᴜ', v:'ᴠ', w:'ᴡ', x:'x', y:'ʏ', z:'ᴢ',
+    A:'ᴀ', B:'ʙ', C:'ᴄ', D:'ᴅ', E:'ᴇ', F:'ꜰ', G:'ɢ', H:'ʜ', I:'ɪ', J:'ᴊ',
+    K:'ᴋ', L:'ʟ', M:'ᴍ', N:'ɴ', O:'ᴏ', P:'ᴘ', Q:'ǫ', R:'ʀ', S:'ѕ', T:'ᴛ',
+    U:'ᴜ', V:'ᴠ', W:'ᴡ', X:'x', Y:'ʏ', Z:'ᴢ',
+    'é':'ᴇ́', 'è':'ᴇ̀', 'ê':'ᴇ̂', 'ç':'ᴄ̧', 'à':'ᴀ̀', 'ô':'ᴏ̂'
   };
-  return text.split('').map(c => azMap[c] || c).join('');
+  return text.split('').map(c => smallCapsMap[c] || c).join('');
 }
 
-// ==========================================
-// 🎨 ENGIN CANVAS POUR L'AFFICHAGE HELP
-// ==========================================
-async function generateHelpCanvas(userId, userName, totalCommands) {
-  const canvas = createCanvas(900, 450);
+async function generateHelpCanvas(userId, userName, categories) {
+  const allFlattened = [];
+  
+  // Tri et organisation des catégories avec récupération des auteurs uniques par catégorie
+  Object.keys(categories).sort().forEach(cat => {
+    // Récupérer les auteurs des commandes de cette catégorie
+    const authors = [...new Set(categories[cat].map(c => commands.get(c).config.author || "Inconnu"))].join(", ");
+    allFlattened.push({ type: 'cat', name: `${cat.toUpperCase()}`, author: authors });
+    
+    categories[cat].sort().forEach(cmd => {
+      allFlattened.push({ type: 'cmd', name: cmd });
+    });
+  });
+
+  const startY = 145;
+  const lineHeight = 22;
+  const colWidth = 230; // Augmenté pour laisser de la place aux noms longs
+  const startX = 40;
+  
+  let columnsCount = 4;
+  let itemsPerCol = Math.ceil(allFlattened.length / columnsCount);
+  let contentHeight = itemsPerCol * lineHeight;
+  
+  let squareSize = Math.max(850, startY + contentHeight + 60);
+  
+  while ((columnsCount * colWidth + startX * 2) > squareSize) {
+    columnsCount++;
+    itemsPerCol = Math.ceil(allFlattened.length / columnsCount);
+    contentHeight = itemsPerCol * lineHeight;
+    squareSize = Math.max(850, startY + contentHeight + 60);
+  }
+  
+  const canvasWidth = squareSize;
+  const canvasHeight = squareSize;
+
+  const canvas = createCanvas(canvasWidth, canvasHeight);
   const ctx = canvas.getContext('2d');
 
-  // Fond dégradé sombre Style Espace / Cyberpunk
-  let gradient = ctx.createLinearGradient(0, 0, 900, 450);
+  let gradient = ctx.createLinearGradient(0, 0, canvasWidth, canvasHeight);
   gradient.addColorStop(0, '#090a15');
-  gradient.addColorStop(0.5, '#12132c');
+  gradient.addColorStop(0.5, '#101124');
   gradient.addColorStop(1, '#090a15');
   ctx.fillStyle = gradient;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  // Lignes technologiques en arrière-plan (Design Matrix subtil)
-  ctx.strokeStyle = 'rgba(114, 239, 221, 0.03)';
-  ctx.lineWidth = 1;
-  for (let i = 0; i < canvas.width; i += 30) {
-    ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, canvas.height); ctx.stroke();
-  }
+  ctx.strokeStyle = '#00f2fe';
+  ctx.lineWidth = 3;
+  ctx.strokeRect(15, 15, canvasWidth - 30, canvasHeight - 30);
 
-  // Doubles bordures gravées holographiques
-  ctx.strokeStyle = '#72efdd';
-  ctx.lineWidth = 4;
-  ctx.strokeRect(25, 25, 850, 400);
-  ctx.strokeStyle = '#ffffff';
-  ctx.lineWidth = 1;
-  ctx.strokeRect(32, 32, 836, 386);
-
-  // Séparateurs de style
-  ctx.fillStyle = '#72efdd';
-  ctx.font = 'bold 16px "Sans-Serif"';
-  ctx.fillText("✧ ▬▭▬ ▬▬ ✦ ▬▬ ▬▭▬ ✧", 400, 65);
-  ctx.fillText("✧ ▬▭▬ ▬▬ ✦ ▬▬ ▬▭▬ ✧", 400, 395);
-
-  // Intégration circulaire de l'avatar Facebook de l'utilisateur
-  const avatarUrl = `https://graph.facebook.com/${userId}/picture?width=300&height=300&access_token=6628568379%7Cc1e620fa708a1d5696fb991c1bde5662`;
+  const avatarUrl = `https://graph.facebook.com/${userId}/picture?width=150&height=150&access_token=6628568379%7Cc1e620fa708a1d5696fb991c1bde5662`;
   try {
     const userAvatar = await loadImage(avatarUrl);
     ctx.save();
-    ctx.beginPath();
-    ctx.arc(190, 225, 110, 0, Math.PI * 2, true);
-    ctx.closePath();
-    ctx.clip();
-    ctx.drawImage(userAvatar, 80, 115, 220, 220);
+    ctx.beginPath(); ctx.arc(65, 65, 30, 0, Math.PI * 2, true); ctx.clip();
+    ctx.drawImage(userAvatar, 35, 35, 60, 60);
     ctx.restore();
-
-    // Cercle lumineux néon turquoise
-    ctx.strokeStyle = '#72efdd';
-    ctx.lineWidth = 6;
-    ctx.beginPath();
-    ctx.arc(190, 225, 112, 0, Math.PI * 2);
-    ctx.stroke();
+    ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(65, 65, 31, 0, Math.PI * 2); ctx.stroke();
   } catch (e) {
-    ctx.fillStyle = '#72efdd';
-    ctx.beginPath(); ctx.arc(190, 225, 110, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#00f2fe'; ctx.beginPath(); ctx.arc(65, 65, 30, 0, Math.PI * 2); ctx.fill();
   }
 
-  // --- ÉCRITURE DES TEXTES DANS L'IMAGE ---
-  ctx.fillStyle = '#72efdd';
-  ctx.font = 'bold 36px "Sans-Serif"';
-  ctx.fillText("📚 𝑩𝑰𝑩𝑳𝑰𝑶𝑻𝑯𝑬̀𝑸𝑼𝑬 𝑩𝑶𝑻", 400, 125);
+  ctx.fillStyle = '#00f2fe'; ctx.font = 'bold 24px "Sans-Serif"'; ctx.fillText("⚡ PREMIUM SYSTEM INDEX", 120, 55);
+  ctx.fillStyle = '#ffffff'; ctx.font = '13px "Sans-Serif"';
+  const cleanName = userName.length > 20 ? userName.substring(0, 20) + "..." : userName;
+  ctx.fillText(`OPERATOR // ${cleanName.toUpperCase()} | TOTAL: ${allFlattened.filter(i => i.type === 'cmd').length} CMDS`, 120, 78);
 
-  ctx.fillStyle = '#ffffff';
-  ctx.font = 'bold 24px "Sans-Serif"';
-  let cleanName = userName.length > 20 ? userName.substring(0, 20) + "..." : userName;
-  ctx.fillText(`👤 𝑼𝒕𝒊𝒍𝒊𝒔𝒂𝒕𝒆𝒖𝒓 : ${cleanName}`, 400, 185);
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(30, 110); ctx.lineTo(canvasWidth - 30, 110); ctx.stroke();
 
-  ctx.fillStyle = '#ffffff';
-  ctx.font = 'bold 32px "Sans-Serif"';
-  ctx.fillText(`📊 𝑻𝒐𝒕𝒂𝒍 : ${totalCommands} 𝑪𝒐𝒎𝒎𝒂𝒏𝒅𝒆𝒔`, 400, 255);
+  allFlattened.forEach((item, index) => {
+    const col = Math.floor(index / itemsPerCol);
+    const row = index % itemsPerCol;
+    const x = startX + (col * colWidth);
+    const y = startY + (row * lineHeight);
 
-  ctx.fillStyle = '#aaaaaa';
-  ctx.font = 'italic 18px "Sans-Serif"';
-  ctx.fillText("👉 Regarde la liste ci-dessous pour les détails", 400, 310);
-
-  ctx.fillStyle = '#72efdd';
-  ctx.font = 'bold 14px "Sans-Serif"';
-  ctx.fillText("»» CLIQUEZ SUR RECHERCHER POUR FILTRER ««", 400, 355);
+    if (item.type === 'cat') {
+      ctx.fillStyle = '#00f2fe';
+      ctx.font = 'bold 11px "Sans-Serif"';
+      // Coupe le nom de l'auteur si trop long pour la colonne
+      const displayAuthor = item.author.length > 15 ? item.author.substring(0, 12) + '..' : item.author;
+      ctx.fillText(`[ ${item.name} ] ✍️ ${displayAuthor}`, x, y);
+    } else {
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
+      ctx.font = '11px "Sans-Serif"';
+      const displayCmd = item.name.length > 20 ? item.name.substring(0, 17) + '..' : item.name;
+      ctx.fillText(`> ${displayCmd}`, x + 5, y);
+    }
+  });
 
   const tmpDir = path.join(__dirname, "..", "cache");
   await fs.ensureDir(tmpDir);
-  const imagePath = path.join(tmpDir, `help_${Date.now()}_${userId}.png`);
+  const imagePath = path.join(tmpDir, `premium_photo_${Date.now()}_${userId}.png`);
   fs.writeFileSync(imagePath, canvas.toBuffer('image/png'));
   return imagePath;
 }
@@ -109,102 +116,112 @@ async function generateHelpCanvas(userId, userName, totalCommands) {
 module.exports = {
   config: {
     name: "help",
-    version: "6.0",
-    author: "Christus x Célestin 🔥 (Canvas Edition)",
+    version: "19.8",
+    author: "Christus x Célestin 🔥",
     countDown: 2,
     role: 0,
-    shortDescription: { en: "Explorer toutes les commandes avec style" },
+    shortDescription: { en: "Indexation au format carré avec affichage des créateurs." },
     category: "info",
-    guide: { en: "help <commande> ou help -ai <mot>" },
+    guide: { en: "help [all]" },
+  },
+
+  onReply: async function ({ message, Reply, event }) {
+    try {
+      const targetCmd = event.body.trim().toLowerCase();
+      const checkCmd = commands.get(targetCmd) || commands.get(aliases.get(targetCmd));
+
+      if (checkCmd) {
+        const cfg = checkCmd.config;
+        const replyMsg = `
+🌐 [ ᴄᴏɴꜰɪɢᴜʀᴀᴛɪᴏɴ ѕʏѕᴛᴇᴍ // ${cfg.name.toUpperCase()} ]
+──────────────────────────────
+🔹 𝖭𝗈nom : ${toSmallCaps(cfg.name)}
+🔹 𝖢𝗋ᴇ́𝖺𝗍𝖾𝗎𝗋 : ${cfg.author || "Inconnu"}
+🔹 𝖣𝖾𝗌𝖼𝗋𝗂𝗉ᴛɪᴏ𝗇 : ${cfg.description?.en || cfg.shortDescription?.en || "Aucune description"}
+🔹 𝖢𝖺𝗍ᴇ́ɢᴏʀɪᴇ : ${toSmallCaps(cfg.category || "info")}
+🔹 𝖢ᴏᴏʟᴅᴏᴡɴ : ${cfg.countDown || 0}s
+🔹 𝖭𝗂𝗏ᴇᴀᴜ 𝖱ᴏʟᴇ : ${cfg.role === 2 ? "Owner" : cfg.role === 1 ? "Admin" : "Membres"}
+──────────────────────────────`;
+        
+        const res = await message.reply(replyMsg);
+        global.GoatBot.onReply.set(res.messageID, {
+          commandName: this.config.name,
+          messageID: res.messageID,
+          author: event.senderID
+        });
+        return;
+      }
+    } catch (err) {
+      console.error(err);
+    }
   },
 
   onStart: async function ({ message, args, event, usersData }) {
     try {
       const uid = event.senderID;
       const userName = await usersData.getName(uid);
-
-      const autoDelete = async (msgID, delay = 30000) => { // Augmenté à 30s car le menu est plus complet
-        setTimeout(async () => {
-          try { await message.unsend(msgID); } catch {}
-        }, delay);
-      };
-
-      // --- LISTE DES COMMANDES ---
-      if (!args || args.length === 0) {
-        let body = `
-✄┈┈┈┈┈┈┈┈┈┈┈┈┈
-┅┅┅┅┅༻❁༺┅┅┅┅┅
-📚 𝑳𝑰𝑺𝑻𝑬 𝑫𝑬𝑺 𝑪𝑶𝑴𝑴𝑨𝑵𝑫𝑬𝑺
-┅┅┅┅┅༻❁༺┅┅┅┅┅
-`;
-
-        const categories = {};
-        for (let [name, cmd] of commands) {
-          const cat = cmd.config.category || "Autres";
-          if (!categories[cat]) categories[cat] = [];
-          categories[cat].push(name);
-        }
-
-        for (const cat of Object.keys(categories).sort()) {
-          const list = categories[cat]
-            .sort()
-            .map(c => `• ${toAZStyle(c)}`)
-            .join("\n");
-
-          body += `
-✄┈┈┈┈┈┈┈┈┈┈┈┈┈
-┅┅┅┅┅༻❁༺┅┅┅┅┅
-📂 𝑪𝑨𝑻𝑬́𝑮𝑶𝑹𝑰𝑬 : ${toAZStyle(cat)}
-┅┅┅┅┅༻❁༺┅┅┅┅┅
-${list || "• 𝑨𝒖𝒄𝒖𝒏𝒆"}
-┅┅┅┅┅༻❁༺┅┅┅┅┅
-`;
-        }
-
-        body += `
-✄┈┈┈┈┈┈┈┈┈┈┈┈┈
-┅┅┅┅┅༻❁༺┅┅┅┅┅
-📊 𝑻𝒐𝒕𝒂𝒍 : ${commands.size} 𝒄𝒐𝒎𝒎𝒂𝒏𝒅𝒆𝒔
-┅┅┅┅┅༻❁༺┅┅┅┅┅
-
-📌 .help <commande>
-📌 .help -ai <mot>
-
-⚠️ Ce message s'auto-détruira dans 30 secondes.
-✄┈┈┈┈┈┈┈┈┈┈┈┈┈
-`;
-
-        // Génération de l'interface graphique personnalisée
-        const imagePath = await generateHelpCanvas(uid, userName, commands.size);
-
-        const res = await message.reply({ 
-          body, 
-          attachment: fs.createReadStream(imagePath)
-        }, () => {
-          if (fs.existsSync(imagePath)) fs.unlinkSync(imagePath);
-        });
-
-        return autoDelete(res.messageID);
+      
+      const categories = {};
+      let totalCmds = 0;
+      for (let [name, cmd] of commands) {
+        const cat = cmd.config.category || "Autres";
+        if (!categories[cat]) categories[cat] = [];
+        categories[cat].push(name);
+        totalCmds++;
       }
 
-      // --- AJOUT FACULTATIF : RECHERCHE PAR MOT CLÉ (help <commande>) ---
+      if (args[0] && args[0].toLowerCase() === "all") {
+        let textList = `💎 ᴍᴇɴᴜ ᴘʀᴇᴍɪᴜᴍ ━━✥👑✥━━\n`;
+        textList += `📊 ᴛᴏᴛᴀʟ : ${totalCmds} ᴄᴏᴍᴍᴀɴᴅᴇѕ activées.\n`;
+        
+        for (const cat of Object.keys(categories).sort()) {
+          const catAuthors = [...new Set(categories[cat].map(c => commands.get(c).config.author || "Inconnu"))].join(", ");
+          textList += `\n🔹 ᴄᴀᴛᴇ́ɢᴏʀɪᴇ : *${toSmallCaps(cat.toUpperCase())}* (✍️ ${catAuthors})\n`;
+          textList += categories[cat].sort().map(c => ` ∟ sʏsᴛᴇᴍ : ${c}`).join("\n");
+        }
+        textList += `\n\n💬 *💡 ᴀѕᴛᴜᴄᴇ :* Répondez directement à cette liste avec le nom d'une commande pour voir ses détails techniques.`;
+
+        const res = await message.reply(textList);
+        global.GoatBot.onReply.set(res.messageID, {
+          commandName: this.config.name,
+          messageID: res.messageID,
+          author: uid
+        });
+        return;
+      }
+
       if (args[0]) {
         const checkCmd = commands.get(args[0].toLowerCase()) || commands.get(aliases.get(args[0].toLowerCase()));
         if (checkCmd) {
           const cfg = checkCmd.config;
-          let replyMsg = `
-» COMMAND DETAILS «
-═══════════════════
-👤 𝑵𝒐𝒎 : ${toAZStyle(cfg.name)}
-ℹ️ 𝑫𝒆𝒔𝒄𝒓𝒊𝒑𝒕𝒊𝒐𝒏 : ${cfg.description?.en || cfg.shortDescription?.en || "Aucune"}
-📁 𝑪𝒂𝒕𝒆́𝒈𝒐𝒓𝒊𝒆 : ${toAZStyle(cfg.category || "info")}
-⏳ 𝑪𝒐𝒐𝒍𝒅𝒐𝒘𝒏 : ${cfg.countDown || 0}s
-👑 𝑹𝒐𝒍𝒆 𝒓𝒆𝒒𝒖𝒊𝒔 : ${cfg.role === 2 ? "Owner" : cfg.role === 1 ? "Admin" : "Membres"}
-═══════════════════
-`;
+          const replyMsg = `
+🌐 [ ᴄᴏɴꜰɪɢᴜʀᴀᴛɪᴏɴ ѕʏѕᴛᴇᴍ // ${cfg.name.toUpperCase()} ]
+──────────────────────────────
+🔹 𝖭𝗈𝗆 : ${toSmallCaps(cfg.name)}
+🔹 𝖢𝗋ᴇ́𝖺𝗍𝖾𝗎𝗋 : ${cfg.author || "Inconnu"}
+🔹 𝖣𝖾𝗌𝖼𝗋𝗂𝗉ᴛɪᴏ̂ɴ : ${cfg.description?.en || cfg.shortDescription?.en || "Aucune description"}
+🔹 𝖢𝖺𝗍ᴇ́ɢᴏʀɪᴇ : ${toSmallCaps(cfg.category || "info")}
+🔹 𝖢ᴏᴏʟᴅᴏᴡɴ : ${cfg.countDown || 0}s
+🔹 𝖭𝗂𝗏ᴇᴀᴜ 𝖱ᴏ𝒍ᴇ : ${cfg.role === 2 ? "Owner" : cfg.role === 1 ? "Admin" : "Membres"}
+──────────────────────────────`;
           return message.reply(replyMsg);
         }
       }
+
+      const imagePath = await generateHelpCanvas(uid, userName, categories);
+
+      const res = await message.reply({
+        body: "✨ Répondez à cette image avec le nom d'un module pour ouvrir ses configurations.\n\n📱 *Mode Basique :* Utilisez la commande `.help all` si l'image ne charge pas.",
+        attachment: fs.createReadStream(imagePath)
+      }, () => {
+        if (fs.existsSync(imagePath)) fs.unlinkSync(imagePath);
+      });
+
+      global.GoatBot.onReply.set(res.messageID, {
+        commandName: this.config.name,
+        messageID: res.messageID,
+        author: uid
+      });
 
     } catch (err) {
       console.error(err);
