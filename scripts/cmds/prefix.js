@@ -4,31 +4,31 @@ const path = require("path");
 const { utils } = global;
 
 // ==========================================
-// 🎨 ENGINE CANVAS CYBERPUNK - VERSION COMPACTE (400x400)
+// 🎨 ENGINE CANVAS MINIMALISTE BLEU & NOIR (280x280)
 // ==========================================
 async function generatePrefixCanvas(userId, title, prefixText, detailsText, themeColor, badgeText = "STATUS") {
-	const size = 400; // Taille moyenne réduite et optimisée
+	const size = 280; // Format ultra compact et stylé
 	const canvas = createCanvas(size, size);
 	const ctx = canvas.getContext('2d');
 
-	// Fond sombre Cyberpunk
-	let gradient = ctx.createRadialGradient(size/2, size/2, 30, size/2, size/2, size);
-	gradient.addColorStop(0, '#121826');
-	gradient.addColorStop(1, '#0a0d14');
+	// Fond sombre profond (Bleu nuit très foncé / Noir)
+	let gradient = ctx.createRadialGradient(size/2, size/2, 20, size/2, size/2, size);
+	gradient.addColorStop(0, '#0a0d16');
+	gradient.addColorStop(1, '#04050a');
 	ctx.fillStyle = gradient;
 	ctx.fillRect(0, 0, size, size);
 
-	// Bordures Néon fines
+	// Bordures fines Néon Cyber
 	ctx.strokeStyle = themeColor;
-	ctx.lineWidth = 3;
-	ctx.strokeRect(15, 15, size - 30, size - 30);
+	ctx.lineWidth = 2;
+	ctx.strokeRect(10, 10, size - 20, size - 20);
 
-	const avatarX = size / 2;
-	const avatarY = 105;
-	const radius = 45;
+	const avatarX = 55;
+	const avatarY = 55;
+	const radius = 28;
 
-	// Récupération de l'avatar
-	const avatarUrl = `https://graph.facebook.com/${userId}/picture?width=150&height=150&access_token=6628568379%7Cc1e620fa708a1d5696fb991c1bde5662`;
+	// Récupération et affichage de l'avatar de l'utilisateur
+	const avatarUrl = `https://graph.facebook.com/${userId}/picture?width=100&height=100&access_token=6628568379%7Cc1e620fa708a1d5696fb991c1bde5662`;
 	try {
 		const userAvatar = await loadImage(avatarUrl);
 		ctx.save();
@@ -39,61 +39,58 @@ async function generatePrefixCanvas(userId, title, prefixText, detailsText, them
 		ctx.drawImage(userAvatar, avatarX - radius, avatarY - radius, radius * 2, radius * 2);
 		ctx.restore();
 
-		ctx.strokeStyle = themeColor;
-		ctx.lineWidth = 3;
+		ctx.strokeStyle = '#ffffff';
+		ctx.lineWidth = 1.5;
 		ctx.beginPath();
-		ctx.arc(avatarX, avatarY, radius + 2, 0, Math.PI * 2);
+		ctx.arc(avatarX, avatarY, radius + 1, 0, Math.PI * 2);
 		ctx.stroke();
 	} catch (e) {
 		ctx.fillStyle = themeColor;
 		ctx.beginPath(); 
 		ctx.arc(avatarX, avatarY, radius, 0, Math.PI * 2); 
 		ctx.fill();
-		ctx.fillStyle = '#ffffff';
-		ctx.font = 'bold 22px "Sans-Serif"';
-		ctx.textAlign = 'center';
-		ctx.fillText("🤖", avatarX, avatarY + 8);
 	}
 
-	ctx.textAlign = 'center';
-
-	// Badge de statut
+	// Badge Statut (Haut Droite)
 	ctx.fillStyle = themeColor;
-	ctx.fillRect(size / 2 - 45, 165, 90, 18);
-	ctx.fillStyle = '#ffffff';
-	ctx.font = 'bold 9px "Sans-Serif"';
-	ctx.fillText(badgeText.toUpperCase(), size / 2, 177);
+	ctx.fillRect(size - 110, 35, 75, 14);
+	ctx.fillStyle = '#000000';
+	ctx.font = 'bold 8px "Sans-Serif"';
+	ctx.textAlign = 'center';
+	ctx.fillText(badgeText.toUpperCase(), size - 72, 45);
 
-	// Titre principal
+	// Titre (En dessous de l'avatar)
+	ctx.textAlign = 'left';
 	ctx.fillStyle = '#ffffff';
-	ctx.font = 'bold 16px "Sans-Serif"';
-	ctx.fillText(title.toUpperCase(), size / 2, 210);
+	ctx.font = 'bold 12px "Sans-Serif"';
+	ctx.fillText(title.toUpperCase(), 25, 110);
 
-	// Ligne technique
-	ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+	// Ligne de séparation technique
+	ctx.strokeStyle = 'rgba(0, 242, 254, 0.15)';
 	ctx.lineWidth = 1;
-	ctx.beginPath(); ctx.moveTo(60, 230); ctx.lineTo(size - 60, 230); ctx.stroke();
+	ctx.beginPath(); ctx.moveTo(25, 122); ctx.lineTo(size - 25, 122); ctx.stroke();
 
 	// Gros Préfixe au centre
+	ctx.textAlign = 'center';
 	ctx.fillStyle = themeColor;
-	ctx.font = 'bold 52px "Sans-Serif"';
-	ctx.fillText(prefixText, size / 2, 285);
+	ctx.font = 'bold 55px "Sans-Serif"';
+	ctx.fillText(prefixText, size / 2, 195);
 
-	// Infos sous-titre
-	ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
-	ctx.font = '11px "Sans-Serif"';
-	ctx.fillText("INFINIX SYSTEM PREFIX", size / 2, 310);
-
-	// Détails de la configuration
-	ctx.fillStyle = '#8a92a6';
-	ctx.font = '12px "Sans-Serif"';
-	const cleanDetails = detailsText.length > 45 ? detailsText.substring(0, 42) + "..." : detailsText;
-	ctx.fillText(cleanDetails, size / 2, 345);
-
-	// Pied de page
-	ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
+	// Sous-texte "PREFIX"
+	ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
 	ctx.font = 'bold 9px "Sans-Serif"';
-	ctx.fillText("» INFINIX ENGINE MATRIX V2.5 «", size / 2, 380);
+	ctx.fillText("SYSTEM PREFIX", size / 2, 215);
+
+	// Détails mineurs en bas
+	ctx.fillStyle = '#8a92a6';
+	ctx.font = '10px "Sans-Serif"';
+	const cleanDetails = detailsText.length > 35 ? detailsText.substring(0, 32) + "..." : detailsText;
+	ctx.fillText(cleanDetails, size / 2, 245);
+
+	// Signature footer
+	ctx.fillStyle = 'rgba(0, 242, 254, 0.2)';
+	ctx.font = '8px "Sans-Serif"';
+	ctx.fillText("» CORE MATRIX MINI «", size / 2, 265);
 
 	const tmpDir = path.join(__dirname, "..", "cache");
 	await fs.ensureDir(tmpDir);
@@ -106,7 +103,7 @@ module.exports = {
 	config: {
 		name: "prefix",
 		version: "2.5",
-		author: "NTKhang x Célestin 🔥 (Canvas Compact)",
+		author: "NTKhang x Célestin 🔥",
 		countDown: 5,
 		role: 0,
 		description: "Changer ou afficher le préfixe de commande du bot",
@@ -122,22 +119,25 @@ module.exports = {
 		if (!args[0]) {
 			const sysPrefix = global.GoatBot.config.prefix;
 			const groupPrefix = utils.getPrefix(event.threadID);
-			const imagePath = await generatePrefixCanvas(senderID, "Infinix Bot Prefix", groupPrefix, `Global Engine : [ ${sysPrefix} ]`, "#72efdd", "ACTIVE");
+			const imagePath = await generatePrefixCanvas(senderID, "Core System", groupPrefix, `Global : [ ${sysPrefix} ]`, "#00f2fe", "ACTIVE");
 			
-			// Message de texte supprimé, envoi de l'image seule
 			return message.reply({
 				attachment: fs.createReadStream(imagePath)
-			}, () => fs.unlinkSync(imagePath));
+			}, () => {
+				setTimeout(() => { if (fs.existsSync(imagePath)) fs.unlinkSync(imagePath); }, 2000);
+			});
 		}
 
 		if (args[0] == 'reset') {
 			await threadsData.set(event.threadID, null, "data.prefix");
 			const defaultPrefix = global.GoatBot.config.prefix;
-			const imagePath = await generatePrefixCanvas(senderID, "Reset System", defaultPrefix, "Retour aux paramètres d'usine", "#ff4d6d", "RESET");
+			const imagePath = await generatePrefixCanvas(senderID, "Reset System", defaultPrefix, "Retour usine", "#ff4d6d", "RESET");
 			
 			return message.reply({
 				attachment: fs.createReadStream(imagePath)
-			}, () => fs.unlinkSync(imagePath));
+			}, () => {
+				setTimeout(() => { if (fs.existsSync(imagePath)) fs.unlinkSync(imagePath); }, 2000);
+			});
 		}
 
 		const newPrefix = args[0];
@@ -148,13 +148,12 @@ module.exports = {
 		};
 
 		if (args[1] === "-g") {
-			if (role < 2) return; // Sécurisé sans message inutile
+			if (role < 2) return;
 			formSet.setGlobal = true;
 		} else {
 			formSet.setGlobal = false;
 		}
 
-		// Utilise directement la création de réaction pour confirmer
 		return message.reply(
 			"⚠️ Réagissez à ce message pour valider le changement.",
 			(err, info) => {
@@ -172,17 +171,21 @@ module.exports = {
 			global.GoatBot.config.prefix = newPrefix;
 			fs.writeFileSync(global.client.dirConfig, JSON.stringify(global.GoatBot.config, null, 2));
 			
-			const imagePath = await generatePrefixCanvas(author, "Global Config", newPrefix, "Prise en compte sur tout le réseau", "#7000ff", "GLOBAL");
+			const imagePath = await generatePrefixCanvas(author, "Global Config", newPrefix, "Réseau global mis à jour", "#7000ff", "GLOBAL");
 			return message.reply({
 				attachment: fs.createReadStream(imagePath)
-			}, () => fs.unlinkSync(imagePath));
+			}, () => {
+				setTimeout(() => { if (fs.existsSync(imagePath)) fs.unlinkSync(imagePath); }, 2000);
+			});
 		} else {
 			await threadsData.set(event.threadID, newPrefix, "data.prefix");
 			
-			const imagePath = await generatePrefixCanvas(author, "Local Config", newPrefix, "Modifié pour ce groupe", "#00f2fe", "LOCAL");
+			const imagePath = await generatePrefixCanvas(author, "Local Config", newPrefix, "Ce groupe uniquement", "#00f2fe", "LOCAL");
 			return message.reply({
 				attachment: fs.createReadStream(imagePath)
-			}, () => fs.unlinkSync(imagePath));
+			}, () => {
+				setTimeout(() => { if (fs.existsSync(imagePath)) fs.unlinkSync(imagePath); }, 2000);
+			});
 		}
 	},
 
@@ -192,11 +195,13 @@ module.exports = {
 			const sysPrefix = global.GoatBot.config.prefix;
 			const groupPrefix = utils.getPrefix(event.threadID);
 
-			const imagePath = await generatePrefixCanvas(uid, "Infinix Bot Prefix", groupPrefix, `Global Engine : [ ${sysPrefix} ]`, "#72efdd", "ACTIVE");
+			const imagePath = await generatePrefixCanvas(uid, "Core System", groupPrefix, `Global : [ ${sysPrefix} ]`, "#00f2fe", "ACTIVE");
 
 			return message.reply({
 				attachment: fs.createReadStream(imagePath)
-			}, () => fs.unlinkSync(imagePath));
+			}, () => {
+				setTimeout(() => { if (fs.existsSync(imagePath)) fs.unlinkSync(imagePath); }, 2000);
+			});
 		}
 	}
 };
