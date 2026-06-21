@@ -1,162 +1,181 @@
-# index.js
-Goat.newVersionDetected=✧ ▬▭▬ ▬▬ ✦✧✦ ▬▬ ▬▬ ✧\n⚠️ 𝑽𝒐𝒖𝒔 𝒖𝒕𝒊𝒍𝒊𝒔𝒆𝒛 𝒍𝒂 𝒗𝒆𝒓𝒔𝒊𝒐𝒏 %1, 𝒍𝒂 𝒅𝒆𝒓𝒏𝒊𝒆̀𝒓𝒆 𝒗𝒆𝒓𝒔𝒊𝒐𝒏 𝒆𝒔𝒕 %2.\n» 𝑽𝒆𝒖𝒊𝒍𝒍𝒆𝒛 𝒎𝒆𝒕𝒕𝒓𝒆 𝒂̀ 𝒋𝒐𝒖𝒓 𝒆𝒏 𝒕𝒂𝒑𝒂𝒏𝒕 : %3\n✧ ▬▭▬ ▭▬ ✦✧✦ ▬▭ ▬▭▬ ✧
-Goat.autoRestart1=Le bot redémarrera automatiquement dans %1
-Goat.autoRestart2=Le bot redémarrera automatiquement via le cron job : %1
-Goat.googleApiTokenExpired=✧ ▬▭▬ ▬▬ ✦✧✦ ▬▬ ▬▬ ✧\n❌ 𝑳𝒆 𝒕𝒐𝒌𝒆𝒏 𝒅𝒆 𝒓𝒂𝒇𝒓𝒂𝒊̂𝒄𝒉𝒊𝒔𝒔𝒆𝒎𝒆𝒏𝒕 𝑮𝒐𝒐𝒈𝒍𝒆 𝑨𝑷𝑰 𝒂 𝒆𝒙𝒑𝒊𝒓𝒆́ 𝒐𝒖 𝒂 𝒆́𝒕𝒆́ 𝒓𝒆́𝒗𝒐𝒒𝒖𝒆́.\n» 𝑶𝒃𝒕𝒆𝒏𝒆𝒛-𝒆𝒏 𝒖𝒏 𝒏𝒐𝒖𝒗𝒆𝒂𝒖 : https://developers.google.com/oauthplayground/\n✧ ▬▭▬ ▭▬ ✦✧✦ ▬▭ ▬▭▬ ✧
+const { createCanvas, loadImage } = require('canvas');
+const fs = require('fs-extra');
+const path = require('path');
 
-# bot/login/login.js
-login.currentlyLogged=Connexion en cours
-login.notFoundDirAccount=✧ ▬▭▬ ▬▬ ✦✧✦ ▬▬ ▬▬ ✧\n❌ 𝑰𝒎𝒑𝒐𝒔𝒔𝒊𝒃𝒍𝒆 𝒅𝒆 𝒕𝒓𝒐𝒖𝒗𝒆𝒓 𝒍𝒆 𝒇𝒊𝒄𝒉𝒊𝒆𝒓 %1\n✧ ▬▭▬ ▭▬ ✦✧✦ ▬▭ ▬▭▬ ✧
-login.loginToken=Connexion avec un access token
-login.loginCookieString=Connexion avec un cookie string
-login.loginCookieNetscape=Connexion avec un cookie netscape
-login.loginCookieArray=Connexion avec un cookie array
-login.loginPassword=Connexion avec email et mot de passe...
-login.accountError=✧ ▬▭▬ ▬▬ ✦✧✦ ▬▬ ▬▬ ✧\n❌ 𝑬𝒓𝒓𝒆𝒖𝒓 𝒅𝒆 𝒄𝒐𝒏𝒇𝒊𝒈𝒖𝒓𝒂𝒕𝒊𝒐𝒏 𝒅𝒆 𝒄𝒐𝒎𝒑𝒕𝒆.\n» 𝑭𝒐𝒓𝒎𝒂𝒕 𝒂𝒕𝒕𝒆𝒏𝒅𝒖 : %1 𝒐𝒖 %2 𝒅𝒂𝒏𝒔 𝒍𝒆 𝒇𝒊𝒄𝒉𝒊𝒆𝒓 %7\n✧ ▬▭▬ ▭▬ ✦✧✦ ▬▭ ▬▭▬ ✧
-login.cannotFindAccount=✧ ▬▭▬ ▬▬ ✦✧✦ ▬▬ ▬▬ ✧\n❌ 𝑰𝒎𝒑𝒐𝒔𝒔𝒊𝒃𝒍𝒆 𝒅𝒆 𝒕𝒓𝒐𝒖𝒗𝒆𝒓 𝒖𝒏 𝒄𝒐𝒎𝒑𝒕𝒆 𝑭𝒂𝒄𝒆𝒃𝒐𝒐𝒌.\n» 𝑪𝒉𝒐𝒊𝒔𝒊𝒔𝒔𝒆𝒛 𝒖𝒏𝒆 𝒐𝒑𝒕𝒊𝒐𝒏 𝒄𝒊-𝒅𝒆𝒔𝒔𝒐𝒖𝒔 :\n✧ ▬▭▬ ▭▬ ✦✧✦ ▬▭ ▬▭▬ ✧
-login.chooseAccount=Connexion avec email et mot de passe
-login.chooseToken=Connexion avec token full permission
-login.chooseCookieString=Connexion avec cookie string
-login.chooseCookieArray=Connexion avec cookie array
-login.loginWith=Vous avez choisi de %1
-login.inputEmail=> Veuillez entrer votre email (id) ou numéro de téléphone du compte Facebook :
-login.inputPassword=> Veuillez entrer votre mot de passe :
-login.input2FA=> Veuillez entrer le code 2FA (laissez vide si vous n'avez pas activé 2FA) :
-login.inputToken=> Veuillez entrer votre token full permission (commence par EAAAA) :
-login.inputCookieString=> Veuillez entrer votre cookie string :
-login.inputCookieArray=> Veuillez entrer votre cookie array :
-login.refreshCookie=Actualisation du cookie...
-login.refreshCookieError=✧ ▬▭▬ ▬▬ ✦✧✦ ▬▬ ▬▬ ✧\n❌ 𝑼𝒏𝒆 𝒆𝒓𝒓𝒆𝒖𝒓 𝒆𝒔𝒕 𝒔𝒖𝒓𝒗𝒆𝒏𝒖𝒆 𝒍𝒐𝒓𝒔 𝒅𝒆 𝒍’𝒂𝒄𝒕𝒖𝒂𝒍𝒊𝒔𝒂𝒕𝒊𝒐𝒏 𝒅𝒖 𝒄𝒐𝒐𝒌𝒊𝒆\n✧ ▬▭▬ ▭▬ ✦✧✦ ▬▭ ▬▭▬ ✧
-login.refreshCookieSuccess=Cookie actualisé avec succès, redémarrez le bot pour utiliser le nouveau cookie
-login.refreshCookieWarning=✧ ▬▭▬ ▬▬ ✦✧✦ ▬▬ ▬▬ ✧\n⚠️ 𝑴𝒐𝒅𝒆 𝒅’𝒂𝒖𝒕𝒐-𝒂𝒄𝒕𝒖𝒂𝒍𝒊𝒔𝒂𝒕𝒊𝒐𝒏 𝒂𝒄𝒕𝒊𝒗𝒆́ 𝒔𝒂𝒏𝒔 𝒆𝒎𝒂𝒊𝒍/𝒎𝒐𝒕 𝒅𝒆 𝒑𝒂𝒔𝒔𝒆 𝒅𝒂𝒏𝒔 𝒄𝒐𝒏𝒇𝒊𝒈.𝒋𝒔𝒐𝒏\n✧ ▬▭▬ ▭▬ ✦✧✦ ▬▭ ▬▭▬ ✧
-login.tokenError=✧ ▬▭▬ ▬▬ ✦✧✦ ▬▬ ▬▬ ✧\n❌ 𝑳𝒆 𝒕𝒐𝒌𝒆𝒏 𝒆𝒔𝒕 𝒊𝒏𝒗𝒂𝒍𝒊𝒅𝒆 𝒐𝒖 𝒆𝒙𝒑𝒊𝒓𝒆́.\n» 𝑼𝒕𝒊𝒍𝒊𝒔𝒆𝒛 𝒍𝒆 𝒇𝒐𝒓𝒎𝒂𝒕 %1 𝒅𝒂𝒏𝒔 𝒍𝒆 𝒇𝒊𝒄𝒉𝒊𝒆𝒓 %2\n✧ ▬▭▬ ▭▬ ✦✧✦ ▬▭ ▬▭▬ ✧
-login.cookieError=✧ ▬▭▬ ▬▬ ✦✧✦ ▬▬ ▬▬ ✧\n❌ 𝑳𝒆 𝒄𝒐𝒐𝒌𝒊𝒆 𝒆𝒔𝒕 𝒊𝒏𝒗𝒂𝒍𝒊𝒅𝒆 𝒐𝒖 𝒆𝒙𝒑𝒊𝒓𝒆́.\n✧ ▬▭▬ ▭▬ ✦✧✦ ▬▭ ▬▭▬ ✧
-login.loginPasswordError=✧ ▬▭▬ ▬▬ ✦✧✦ ▬▬ ▬▬ ✧\n❌ 𝑬𝒓𝒓𝒆𝒖𝒓 𝒍𝒐𝒓𝒔 𝒅𝒆 𝒍𝒂 𝒄𝒐𝒏𝒏𝒆𝒙𝒊𝒐𝒏 𝒂𝒗𝒆𝒄 𝒆𝒎𝒂𝒊𝒍 & 𝒎𝒐𝒕 𝒅𝒆 𝒑𝒂𝒔𝒔𝒆 𝒅𝒂𝒏𝒔 𝒄𝒐𝒏𝒇𝒊𝒈.𝒋𝒔𝒐𝒏\n✧ ▬▭▬ ▭▬ ✦✧✦ ▬▭ ▬▭▬ ✧
-login.loginSuccess=Connexion réussie
-login.loginError=✧ ▬▭▬ ▬▬ ✦✧✦ ▬▬ ▬▬ ✧\n❌ 𝑼𝒏𝒆 𝒆𝒓𝒓𝒆𝒖𝒓 𝒆𝒔𝒕 𝒔𝒖𝒓𝒗𝒆𝒏𝒖𝒆 𝒍𝒐𝒓𝒔 𝒅𝒆 𝒍𝒂 𝒄𝒐𝒏𝒏𝒆𝒙𝒊𝒐𝒏\n✧ ▬▭▬ ▭▬ ✦✧✦ ▬▭ ▬▭▬ ✧
-login.openDashboardSuccess=Page de gestion du bot ouverte avec succès
-login.openDashboardError=✧ ▬▭▬ ▬▬ ✦✧✦ ▬▬ ▬▬ ✧\n❌ 𝑼𝒏𝒆 𝒆𝒓𝒓𝒆𝒖𝒓 𝒆𝒔𝒕 𝒔𝒖𝒓𝒗𝒆𝒏𝒖𝒆 𝒍𝒐𝒓𝒔 𝒅𝒆 𝒍’𝒐𝒖𝒗𝒆𝒓𝒕𝒖𝒓𝒆 𝒅𝒆 𝒍𝒂 𝒑𝒂𝒈𝒆 𝒅𝒆 𝒈𝒆𝒔𝒕𝒊𝒐𝒏\n✧ ▬▭▬ ▭▬ ✦✧✦ ▬▭ ▬▭▬ ✧
-login.changeGbanData=✧ ▬▭▬ ▬▬ ✦✧✦ ▬▬ ▬▬ ✧\n❌ 𝑳𝑬𝑺 𝑫𝑶𝑵𝑵𝑬́𝑬𝑺 𝑶𝑵𝑻 𝑬́𝑻𝑬́ 𝑴𝑶𝑫𝑰𝑭𝑰𝑬́𝑬𝑺, 𝑰𝑴𝑷𝑶𝑺𝑺𝑰𝑩𝑳𝑬 𝑫𝑬 𝑳𝑨𝑵𝑪𝑬𝑹 𝑳𝑬 𝑩𝑶𝑻\n✧ ▬▭▬ ▭▬ ✦✧✦ ▬▭ ▬▭▬ ✧
-login.errorNoti=✧ ▬▭▬ ▬▬ ✦✧✦ ▬▬ ▬▬ ✧\n❌ 𝑼𝒏𝒆 𝒆𝒓𝒓𝒆𝒖𝒓 𝒆𝒔𝒕 𝒔𝒖𝒓𝒗𝒆𝒏𝒖𝒆 𝒍𝒐𝒓𝒔 𝒅𝒆 𝒍𝒂 𝒓𝒆́𝒄𝒖𝒑𝒆́𝒓𝒂𝒕𝒊𝒐𝒏 𝒅𝒖 𝒎𝒆𝒔𝒔𝒂𝒈𝒆\n✧ ▬▭▬ ▭▬ ✦✧✦ ▬▭ ▬▭▬ ✧
-login.refreshFbstateSuccess=Le fichier %1 a été actualisé
-login.refreshFbstateError=✧ ▬▭▬ ▬▬ ✦✧✦ ▬▬ ▬▬ ✧\n❌ 𝑼𝒏𝒆 𝒆𝒓𝒓𝒆𝒖𝒓 𝒆𝒔𝒕 𝒔𝒖𝒓𝒗𝒆𝒏𝒖𝒆 𝒍𝒐𝒓𝒔 𝒅𝒆 𝒍’𝒂𝒄𝒕𝒖𝒂𝒍𝒊𝒔𝒂𝒕𝒊𝒐𝒏 𝒅𝒖 𝒇𝒊𝒄𝒉𝒊𝒆𝒓 %1\n✧ ▬▭▬ ▭▬ ✦✧✦ ▬▭ ▬▭▬ ✧
-login.youAreBanned=✧ ▬▭▬ ▬▬ ✦✧✦ ▬▬ ▬▬ ✧\n❌ 𝑽𝒐𝒖𝒔 𝒂𝒗𝒆?? 𝒆́𝒕𝒆́ 𝒃𝒂𝒏𝒏𝒊 𝒅𝒖 𝒑𝒓𝒐𝒋𝒆𝒄𝒕 𝑮𝒐𝒂𝒕-𝑩𝑶𝑻\n✧ ▬▭▬ ▭▬ ✦✧✦ ▬▭ ▬▭▬ ✧
-login.checkGbanError=✧ ▬▭▬ ▬▬ ✦✧✦ ▬▬ ▬▬ ✧\n❌ 𝑬𝒓𝒓𝒆𝒖𝒓 𝒅𝒆 𝒗𝒆́𝒓𝒊𝒇𝒊𝒄𝒂𝒕𝒊𝒐𝒏 𝑮𝑩𝑨𝑵. 𝑳𝒂𝒏𝒄𝒆𝒛 𝒍𝒂 𝒄𝒐𝒎𝒎𝒂𝒏𝒅𝒆 : 𝒏𝒐𝒅𝒆 𝒖𝒑𝒅𝒂𝒕𝒆\n✧ ▬▭▬ ▭▬ ✦✧✦ ▬▭ ▬▭▬ ✧
-login.gbanMessage=✧ ▬▭▬ ▬▬ ✦✧✦ ▬▬ ▬▬ ✧\n🚫 𝑽𝒐𝒖𝒔 𝒂𝒗𝒆𝒛 𝒆́𝒕𝒆́ 𝒃𝒂𝒏𝒏𝒊 𝒅𝒖 𝒑𝒓𝒐𝒋𝒆𝒄𝒕 𝑮𝒐𝒂𝒕-𝑩𝒐𝒕 𝒍𝒆 %1\n» 𝑹𝒂𝒊𝒔𝒐𝒏 : %2\n» 𝑯𝒆𝒖𝒓𝒆 : %3\n✧ ▬▭▬ ▭▬ ✦✧✦ ▬▭ ▬▭▬ ✧
-login.gbanMessageToDate=node✧ ▬▭▬ ▬▬ ✦✧✦ ▬▬ ▬▬ ✧\n🚫 𝑽𝒐𝒖𝒔 𝒂𝒗𝒆𝒛 𝒆́𝒕𝒆́ 𝒃𝒂𝒏𝒏𝒊 𝒅𝒖 𝒑𝒓𝒐𝒋𝒆𝒄𝒕 𝑮𝒐𝒂𝒕-𝑩𝒐𝒕 𝒍𝒆 %1\n» 𝑹𝒂𝒊𝒔𝒐𝒏 : %2\n» 𝑯𝒆𝒖𝒓𝒆 : %3\n» 𝑱𝒖𝒔𝒒𝒖’𝒂̀ : %4\n✧ ▬▭▬ ▭▬ ✦✧✦ ▬▭ ▬▭▬ ✧
-login.gbanAdminMessage=✧ ▬▭▬ ▬▬ ✦✧✦ ▬▬ ▬▬ ✧\n🚫 𝑳’𝒖𝒕𝒊𝒍𝒊𝒔𝒂𝒕𝒆𝒖𝒓 %1 𝒂 𝒆́𝒕𝒆́ 𝒃𝒂𝒏𝒏𝒊 𝒅𝒖 𝒑𝒓𝒐𝒋𝒆𝒄𝒕 𝑮𝒐𝒂𝒕-𝑩𝒐𝒕 𝒍𝒆 %2\n» 𝑹𝒂𝒊𝒔𝒐𝒏 : %3\n✧ ▬▭▬ ▭▬ ✦✧✦ ▬▭ ▬▭▬ ✧
-login.openServerUptimeSuccess=🚀 Serveur uptime ouvert : %1
-login.openServerUptimeError=✧ ▬▭▬ ▬▬ ✦✧✦ ▬▬ ▬▬ ✧\n❌ 𝑼𝒏𝒆 𝒆𝒓𝒓𝒆𝒖𝒓 𝒆𝒔𝒕 𝒔𝒖𝒓𝒗𝒆𝒏𝒖𝒆, 𝒊𝒎𝒑𝒐𝒔𝒔𝒊𝒃𝒍𝒆 𝒅’𝒐𝒖𝒗𝒓𝒊𝒓 𝒍𝒆 𝒔𝒆𝒓𝒗𝒆𝒖𝒓 𝒖𝒑𝒕𝒊𝒎𝒆\n✧ ▬▭▬ ▭▬ ✦✧✦ ▬▭ ▬▭▬ ✧
-login.restartListenMessage=Redémarrage ListenMQTT activé toutes les %1
-login.stopRestartListenMessage=Redémarrage ListenMQTT désactivé
-login.restartListenMessageError=✧ ▬▭▬ ▬▬ ✦✧✦ ▬▬ ▬▬ ✧\n❌ 𝑼𝒏𝒆 𝒆𝒓𝒓𝒆𝒖𝒓 𝒆𝒔𝒕 𝒔𝒖𝒓𝒗𝒆𝒏𝒖𝒆 𝒍𝒐𝒓𝒔 𝒅𝒆 𝒍𝒂 𝒓𝒆𝒍𝒂𝒏𝒄𝒆 𝒅𝒆 𝑳𝒊𝒔𝒕𝒆𝒏𝑴𝑸𝑻\n✧ ▬▭▬ ▭▬ ✦✧✦ ▬▭ ▬▭▬ ✧
-login.restartListenMessage2=ListenMQTT redémarré avec succès
-login.refreshCookieAfter=Actualisation du cookie après %1
-login.listenMqttClose=ListenMQTT fermé
-login.listenMqttCloseByUser=ListenMQTT fermé par l’utilisateur
-login.retryCheckLiveCookie=✧ ▬▭▬ ▬▬ ✦✧✦ ▬▬ ▬▬ ✧\n⚠️ 𝑵𝒐𝒖𝒗𝒆𝒍𝒍𝒆 𝒕𝒆𝒏𝒕𝒂𝒕𝒊𝒗𝒆 𝒅𝒆 𝒗𝒆́𝒓𝒊𝒇𝒊𝒄𝒂𝒕𝒊𝒐𝒏 𝒅𝒖 𝒄𝒐𝒐𝒌𝒊𝒆... %1\n✧ ▬▭▬ ▭▬ ✦✧✦ ▬▭ ▬▭▬ ✧
-login.startBotSuccess=Le bot a démarré avec succès, commence la réception des messages des utilisateurs
+// Découpage automatique des lignes pour les logs d'erreurs denses
+function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
+	const words = text.split(' ');
+	let line = '';
+	let currentY = y;
 
-version.tooOldVersion=✧ ▬▭▬ ▬▬ ✦✧✦ ▬▬ ▬▬ ✧\n❌ 𝑽𝒐𝒖𝒔 𝒖𝒕𝒊𝒍𝒊𝒔𝒆𝒛 𝒖𝒏𝒆 𝒗𝒆𝒓𝒔𝒊𝒐𝒏 𝒕𝒓𝒐𝒑 𝒂𝒏𝒄𝒊𝒆𝒏𝒏𝒆 𝒅𝒆 𝑮𝒐𝒂𝒕-𝑩𝒐𝒕.\n» 𝑴𝒆𝒕𝒕𝒆𝒛 𝒂̀ 𝒋𝒐𝒖𝒓 𝒂𝒗𝒆𝒄 𝒍𝒂 𝒄𝒐𝒎𝒎𝒂𝒏𝒅𝒆 : %1\n✧ ▬▭▬ ▭▬ ✦✧✦ ▬▭ ▬▭▬ ✧
+	for (let n = 0; n < words.length; n++) {
+		let testLine = line + words[n] + ' ';
+		let metrics = ctx.measureText(testLine);
+		if (metrics.width > maxWidth && n > 0) {
+			ctx.fillText(line, x, currentY);
+			line = words[n] + ' ';
+			currentY += lineHeight;
+		} else {
+			line = testLine;
+		}
+	}
+	ctx.fillText(line, x, currentY);
+}
 
-# bot/custom.js
-custom.refreshedFb_dtsg=fb_dtsg et jazoest actualisés avec succès
-custom.refreshedFb_dtsgError=✧ ▬▭▬ ▬▬ ✦✧✦ ▬▬ ▬▬ ✧\n❌ 𝑼𝒏𝒆 𝒆𝒓𝒓𝒆𝒖𝒓 𝒆𝒔𝒕 𝒔𝒖𝒓𝒗𝒆𝒏𝒖𝒆 𝒍𝒐𝒓𝒔 𝒅𝒆 𝒍’𝒂𝒄𝒕𝒖𝒂𝒍𝒊𝒔𝒂𝒕𝒊𝒐𝒏 𝒅𝒆 𝒇𝒃_𝒅𝒕𝒔𝒈 𝒆𝒕 𝒋𝒂𝒛𝒐𝒆𝒔𝒕\n✧ ▬▭▬ ▭▬ ✦✧✦ ▬▭ ▬▭▬ ✧
+// 🖼️ ENGINE CANVAS D'ERREUR ET LOGS MATRIX (1:1)
+async function generateSystemErrorCanvas(userId, errorType, title, logMessage, themeColor) {
+	const size = 600;
+	const canvas = createCanvas(size, size);
+	const ctx = canvas.getContext('2d');
 
-# bot/login/loadData.js
-loadData.loadThreadDataSuccess=Données du groupe %1 chargées avec succès !
-loadData.loadUserDataSuccess=Données de l’utilisateur %1 chargées avec succès !
-loadData.refreshingThreadData=Mise à jour des informations des groupes...
-loadData.refreshThreadDataSuccess=Informations de %1 groupe mises à jour !
-loadData.refreshThreadDataError=✧ ▬▭▬ ▬▬ ✦✧✦ ▬▬ ▬▬ ✧\n❌ 𝑼𝒏𝒆 𝒆𝒓𝒓𝒆𝒖𝒓 𝒆𝒔𝒕 𝒔𝒖𝒓𝒗𝒆𝒏𝒖𝒆 𝒍𝒐𝒓𝒔 𝒅𝒆 𝒍𝒂 𝒎𝒊𝒔𝒆 𝒂̀ 𝒋𝒐𝒖𝒓 𝒅𝒆𝒔 𝒈𝒓𝒐𝒖𝒑𝒆𝒔\n✧ ▬▭▬ ▭▬ ✦✧✦ ▬▭ ▬▭▬ ✧
+	// Fond Cyberpunk Profond & Obscur
+	let gradient = ctx.createRadialGradient(size / 2, size / 2, 30, size / 2, size / 2, size);
+	gradient.addColorStop(0, '#0f111a');
+	gradient.addColorStop(0.8, '#07080f');
+	gradient.addColorStop(1, '#020305');
+	ctx.fillStyle = gradient;
+	ctx.fillRect(0, 0, size, size);
 
-# bot/login/loadScripts.js
-loadScripts.loadScriptsError=✧ ▬▭▬ ▬▬ ✦✧✦ ▬▬ ▬▬ ✧\n❌ 𝑳𝒆𝒔 𝒇𝒊𝒄𝒉𝒊𝒆𝒓𝒔 %1 𝒐𝒏𝒕 𝒑𝒓𝒐𝒗𝒐𝒒𝒖𝒆́ 𝒖𝒏𝒆 𝒆𝒓𝒓𝒆𝒖𝒓 𝒍𝒐𝒓𝒔 𝒅𝒖 𝒄𝒉𝒂𝒓𝒈𝒆𝒎𝒆𝒏𝒕 :\n✧ ▬▭▬ ▭▬ ✦✧✦ ▬▭ ▬▭▬ ✧
-loadScripts.loadScriptsNotMatchOrigin=✧ ▬▭▬ ▬▬ ✦✧✦ ▬▬ ▬▬ ✧\n⚠️ 𝑳𝒆𝒔 𝒇𝒊𝒄𝒉𝒊𝒆𝒓𝒔 %1 𝒏𝒆 𝒄𝒐𝒓𝒓𝒆𝒔𝒑𝒐𝒏𝒅𝒆𝒏𝒕 𝒑𝒂𝒔 𝒂𝒖 𝑮𝒊𝒕𝑈𝒉𝒖𝒃 𝒐𝒇𝒇𝒊𝒄𝒊𝒆𝒍.\n» 𝑽𝒆́𝒓𝒊𝒇𝒊𝒆𝒛 𝒍𝒂 𝒇𝒊𝒂𝒃𝒊𝒍𝒊𝒕𝒆́ 𝒅𝒆 𝒗𝒐𝒔 𝒄𝒐𝒎𝒎𝒂𝒏𝒅𝒆𝒔 :\n✧ ▬▭▬ ▭▬ ✦✧✦ ▬▭ ▬▭▬ ✧
-loadScripts.NOT_FOUND=NON TROUVÉ DANS LE CODE SOURCE ORIGINAL :
-loadScripts.NOT_MATCH=NE CORRESPOND PAS AU CODE SOURCE ORIGINAL :
+	// Grille numérique d'arrière-plan
+	ctx.strokeStyle = 'rgba(255, 255, 255, 0.015)';
+	ctx.lineWidth = 1;
+	for (let i = 0; i < size; i += 25) {
+		ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, size); ctx.stroke();
+		ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(size, i); ctx.stroke();
+	}
 
-# bot/login/socketIO.js
-socketIO.connected=Connecté au serveur socket.io
-socketIO.error=✧ ▬▭▬ ▬▬ ✦✧✦ ▬▬ ▬▬ ✧\n❌ 𝑼𝒏𝒆 𝒆𝒓𝒓𝒆𝒖𝒓 𝒆𝒔𝒕 𝒔𝒖𝒓𝒗𝒆𝒏𝒖𝒆 𝒍𝒐𝒓𝒔 𝒅𝒆 𝒍𝒂 𝒄𝒐𝒏𝒏𝒆𝒙𝒊𝒐𝒏 𝒂𝒖 𝒔𝒆𝒓𝒗𝒆𝒖𝒓 𝒔𝒐𝒄𝒌𝒆𝒕.𝒊𝒐\n✧ ▬▭▬ ▭▬ ✦✧✦ ▬▭ ▬▭▬ ✧
+	// Double cadre Néon Réactif
+	ctx.strokeStyle = themeColor;
+	ctx.lineWidth = 4;
+	ctx.strokeRect(20, 20, size - 40, size - 40);
 
-# bot/handler/handlerCheckData.js
-handlerCheckData.cantCreateThread=✧ ▬▭▬ ▬▬ ✦✧✦ ▬▬ ▬▬ ✧\n❌ 𝑳𝒆𝒔 𝒈𝒓𝒐𝒖𝒑𝒆𝒔 𝒂𝒗𝒆𝒄 𝒍’𝑰𝑫 '%1' 𝒏𝒆 𝒑𝒆𝒖𝒗𝒆𝒏𝒕 𝒑𝒂𝒔 𝒆̂𝒕𝒓𝒆 𝒆́𝒄𝒓𝒊𝒕𝒔 𝒆𝒏 𝑩𝑫𝑫\n✧ ▬▭▬ ▭▬ ✦✧✦ ▬▭ ▬▭▬ ✧
-handlerCheckData.cantCreateUser=✧ ▬▭▬ ▬▬ ✦✧✦ ▬▬ ▬▬ ✧\n❌ 𝑳𝒆𝒔 𝒖𝒕𝒊𝒍𝒊𝒔𝒂𝒕𝒆𝒖𝒓𝒔 𝒂𝒗𝒆𝒄 𝒍’𝑰𝑫 '%1' 𝒏𝒆 𝒑𝒆𝒖𝒗𝒆𝒏𝒕 𝒑𝒂𝒔 𝒆̂𝒕𝒓𝒆 𝒆́𝒄𝒓𝒊𝒕𝒔 𝒆𝒏 𝑩𝑫𝑫\n✧ ▬▭▬ ▭▬ ✦✧✦ ▬▭ ▬▭▬ ✧
+	ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+	ctx.lineWidth = 1;
+	ctx.strokeRect(28, 28, size - 56, size - 56);
 
-# bot/handler/handlerEvents.js
-handlerEvents.userBanned=✧ ▬▭▬ ▬▬ ✦✧✦ ▬▬ ▬▬ ✧\n🚫 𝑽𝒐🇺𝒔 𝒂𝒗𝒆𝒛 𝒆́𝒕𝒆́ 𝒃𝒂𝒏𝒏𝒊 𝒅𝒖 𝒃𝒐𝒕\n» 𝑹𝒂𝒊𝒔𝒐𝒏 : %1\n» 𝑯𝒆𝒖𝒓𝒆 : %2\n» 𝑰𝑫 𝑼𝒕𝒊𝒍𝒊𝒔𝒂𝒕𝒆𝒖𝒓 : %3\n✧ ▬▭▬ ▭▬ ✦✧✦ ▬▭ ▬▭▬ ✧
-handlerEvents.threadBanned=✧ ▬▭▬ ▬▬ ✦✧✦ ▬▬ ▬▬ ✧\n🚫 𝑪𝒆 𝒈𝒓𝒐𝒖𝒑𝒆 𝒂 𝒆́𝒕𝒆́ 𝒃𝒂𝒏𝒏𝒊 𝒅𝒖 𝒃𝒐𝒕\n» 𝑹𝒂𝒊𝒔𝒐𝒏 : %1\n» 𝑯𝒆𝒖𝒓𝒆 : %2\n» 𝑰𝑫 𝑮𝒓𝒐𝒖𝒑𝒆 : %3\n✧ ▬▭▬ ▭▬ ✦✧✦ ▬▭ ▬▭▬ ✧
-handlerEvents.onlyAdminBox=✧ ▬▭▬ ▬▬ ✦✧✦ ▬▬ ▬▬ ✧\n🔒 𝑪𝒆 𝒈𝒓𝒐𝒖𝒑𝒆 𝒆𝒔𝒕 𝒂𝒄𝒕𝒖𝒆𝒍𝒍𝒆𝒎𝒆𝒃𝒕 𝒓𝒆𝒔𝒆𝒓𝒗𝒆́ 𝒂𝒖𝒙 𝒂𝒅𝒎𝒊𝒏𝒊𝒔𝒕𝒓𝒂𝒕𝒆𝒖𝒓𝒔\n✧ ▬▭▬ ▭▬ ✦✧✦ ▬▭ ▬▭▬ ✧
-handlerEvents.onlyAdminBot=✧ ▬▭▬ ▬▬ ✦✧✦ ▬▬ ▬▬ ✧\n❌ | 𝑺𝒆𝒖𝒍 𝒍’𝒂𝒅𝒎𝒊𝒏 𝒅𝒖 𝒃𝒐𝒕 𝒑𝒆𝒖𝒕 𝒖𝒕𝒊𝒍𝒊𝒔𝒆𝒓 𝒍𝒆 𝒃𝒐𝒕\n✧ ▬▭▬ ▭▬ ✦✧✦ ▬▭ ▬▭▬ ✧
-handlerEvents.onlyDeveloperGlobal=✧ ▬▭▬ ▬▬ ✦✧✦ ▬▬ ▬▬ ✧\n⚙️ | 𝑺𝒆𝒖𝒍 𝒍𝒆 𝒅𝒆́𝒗𝒆𝒍𝒐𝒑𝒑𝒆𝒖𝒓 𝒅𝒖 𝒃𝒐𝒕 𝒑𝒆𝒖𝒕 𝒖𝒕𝒊𝒍𝒊𝒔𝒆𝒓 𝒍𝒆 𝒃𝒐𝒕\n✧ ▬▭▬ ▭▬ ✦✧✦ ▬▭ ▬▭▬ ✧
-handlerEvents.onlyVipUserGlobal=✧ ▬▭▬ ▬▬ ✦✧✦ ▬▬ ▬▬ ✧\n💎 | 𝑺𝒆𝒖𝒍𝒔 𝒍𝒆𝒔 𝒖𝒔𝒆𝒓𝒔 𝑽𝑰𝑷 𝒑𝒆𝒖𝒗𝒆𝒏𝒕 𝒖𝒕𝒊𝒍𝒊𝒔𝒆𝒓 𝒍𝒆 𝒃𝒐𝒕\n✧ ▬▭▬ ▭▬ ✦✧✦ ▬▭ ▬▭▬ ✧
+	// Chargement de l'avatar utilisateur ou icône système alternative
+	const avatarX = size / 2;
+	const avatarY = 135;
+	const radius = 55;
+	const avatarUrl = `https://graph.facebook.com/${userId}/picture?width=300&height=300&access_token=6628568379%7Cc1e620fa708a1d5696fb991c1bde5662`;
 
-handlerEvents.commandNotFound=✧ ▬▭▬ ▬▬ ✦✧✦ ▬▬ ▬▬ ✧\n❌ | 𝑳𝒂 𝒄𝒐𝒎𝒎𝒂𝒏𝒅𝒆 "%1" 𝒏’𝒆𝒙𝒊𝒔𝒕𝒆 𝒑𝒂𝒔\n» 𝑻𝒂𝒑𝒆𝒛 %2𝒉𝒆𝒍𝒑 𝒑𝒐𝒖𝒓 𝒗𝒐𝒊𝒓 𝒍𝒆𝒔 𝒄𝒐𝒎𝒎𝒂𝒏𝒅𝒆𝒔\n✧ ▬▭▬ ▭▬ ✦✧✦ ▬▭ ▬▭▬ ✧
-handlerEvents.commandNotFound2=✧ ▬▭▬ ▬▬ ✦✧✦ ▬▬ ▬▬ ✧\n❌ | 𝑳𝒂 𝒄𝒐𝒎𝒎𝒂𝒏𝒅𝒆 𝒒𝒖𝒆 𝒗𝒐🇺𝒔 𝒖𝒕𝒊𝒍𝒊𝒔𝒆𝒛 𝒏’𝒆𝒙𝒊𝒔𝒕𝒆 𝒑𝒂𝒔\n» 𝑻𝒂𝒑𝒆𝒛 %1𝒉𝒆𝒍𝒑 𝒑𝒐𝒖𝒓 𝒂𝒇𝒇𝒊𝒄𝒉𝒆𝒓 𝒍’𝒂𝒊𝒅𝒆\n✧ ▬▭▬ ▭▬ ✦✧✦ ▬▭ ▬▭▬ ✧
-handlerEvents.commandNotFoundSuggestion=✧ ▬▭▬ ▬▬ ✦✧✦ ▬▬ ▬▬ ✧\n🧐 | 𝑳𝒂 𝒄𝒐𝒎𝒎𝒂𝒏𝒅𝒆 𝒒𝒖𝒆 𝒗𝒐🇺𝒔 𝒖𝒕𝒊𝒍𝒊𝒔𝒆𝒛 𝒏’𝒆𝒙𝒊𝒔𝒕𝒆 𝒑𝒂𝒔\n» 𝑽𝒐𝒖𝒍𝒊𝒆𝒛-𝒗𝒐𝒖𝒔 𝒅𝒊𝒓𝒆 : %2%1 ?\n✧ ▬▭▬ ▭▬ ✦✧✦ ▬▭ ▬▭▬ ✧
-handlerEvents.commandSyntaxError=✧ ▬▭▬ ▬▬ ✦✧✦ ▬▬ ▬▬ ✧\n⚠️ | 𝑺𝒚𝒏𝒕𝒂𝒙𝒆 𝒊𝒏𝒄𝒐𝒓𝒓𝒆𝒄𝒕𝒆\n» 𝑻𝒂𝒑𝒆𝒛 %1𝒉𝒆𝒍𝒑 %2 𝒑𝒐𝒖𝒓 𝒗𝒐𝒊𝒓 𝒍𝒆 𝒈𝒖𝒊𝒅𝒆 𝒅’𝒖𝒕𝒊𝒍𝒊𝒔𝒂𝒕𝒊𝒐𝒏\n✧ ▬▭▬ ▭▬ ✦✧✦ ▬▭ ▬▭▬ ✧
+	try {
+		const userAvatar = await loadImage(avatarUrl);
+		ctx.save();
+		ctx.beginPath();
+		ctx.arc(avatarX, avatarY, radius, 0, Math.PI * 2, true);
+		ctx.clip();
+		ctx.drawImage(userAvatar, avatarX - radius, avatarY - radius, radius * 2, radius * 2);
+		ctx.restore();
 
-handlerEvents.onlyAdmin=✧ ▬▭▬ ▬▬ ✦✧✦ ▬▬ ▬▬ ✧\n❌ | 𝑺𝒆𝒖𝒍𝒔 𝒍𝒆𝒔 𝒂𝒅𝒎𝒊𝒏𝒔 𝒅𝒖 𝒈𝒓𝒐𝒖𝒑𝒆 𝒑𝒆𝒖𝒗𝒆𝒏𝒕 𝒖𝒕𝒊𝒍𝒊𝒔𝒆𝒓 𝒍𝒂 𝒄𝒐𝒎𝒎𝒂𝒏𝒅𝒆 "%1"\n✧ ▬▭▬ ▭▬ ✦✧✦ ▬▭ ▬▭▬ ✧
-handlerEvents.onlyAdminToUseOnReply=✧ ▬▭▬ ▬▬ ✦✧✦ ▬▬ ▬▬ ✧\n❌ | 𝑺𝒆𝒖𝒍𝒔 𝒍𝒆𝒔 𝒂𝒅𝒎𝒊𝒏𝒔 𝒑𝒆𝒖𝒗𝒆𝒏𝒕 𝒖𝒕𝒊𝒍𝒊𝒔𝒆𝒓 𝒍𝒂 𝒓𝒆𝒑𝒐𝒏𝒔𝒆 𝒅𝒆 "%1"\n✧ ▬▭▬ ▭▬ ✦✧✦ ▬▭ ▬▭▬ ✧
-handlerEvents.onlyAdminToUseOnReaction=✧ ▬▭▬ ▬▬ ✦✧✦ ▬▬ ▬▬ ✧\n❌ | 𝑺𝒆𝒖𝒍𝒔 𝒍𝒆𝒔 𝒂𝒅𝒎𝒊𝒏𝒔 𝒑𝒆𝒖𝒗𝒆𝒏𝒕 𝒖𝒕𝒊𝒍𝒊𝒔𝒆𝒓 𝒍𝒂 𝒓𝒆𝒂𝒄𝒕𝒊𝒐𝒏 𝒅𝒆 "%1"\n✧ ▬▭▬ ▭▬ ✦✧✦ ▬▭ ▬▭▬ ✧
-handlerEvents.onlyAdminBot2=rose✧ ▬▭▬ ▬▬ ✦✧✦ ▬▬ ▬▬ ✧\n💫 | 𝑺𝒆𝒖𝒍𝒔 𝒍𝒆𝒔 𝒖𝒔𝒆𝒓𝒔 𝑽𝑰𝑷 𝒆𝒕 𝒑𝒍𝒖𝒔 𝒑𝒆𝒖𝒗𝒆𝒏𝒕 𝒖𝒕𝒊𝒍𝒊𝒔𝒆𝒓 𝒍𝒂 𝒄𝒐𝒎𝒎𝒂𝒏𝒅𝒆 "%1"\n✧ ▬▭▬ ▭▬ ✦✧✦ ▬▭ ▬▭▬ ✧
-handlerEvents.onlyAdminBot2ToUseOnReply=✧ ▬▭▬ ▬▬ ✦✧✦ ▬▬ ▬▬ ✧\n💫 | 𝑺𝒆𝒖𝒍𝒔 𝒍𝒆𝒔 𝒖𝒔𝒆𝒓𝒔 𝑽𝑰𝑷 𝒑𝒆𝒖𝒗𝒆𝒏𝒕 𝒖𝒕𝒊𝒍𝒊𝒔𝒆𝒓 𝒍𝒂 𝒓𝒆𝒑𝒐𝒏𝒔𝒆 𝒅𝒆 "%1"\n✧ ▬▭▬ ▭▬ ✦✧✦ ▬▭ ▬▭▬ ✧
-handlerEvents.onlyAdminBot2ToUseOnReaction=✧ ▬▭▬ ▬▬ ✦✧✦ ▬▬ ▬▬ ✧\n💫 | 𝑺𝒆𝒖𝒍𝒔 𝒍𝒆𝒔 𝒖𝒔𝒆𝒓𝒔 𝑽𝑰𝑷 𝒑𝒆𝒖𝒗𝒆𝒏𝒕 𝒖𝒕𝒊𝒍𝒊𝒔𝒆𝒓 𝒍𝒂 𝒓𝒆𝒂𝒄𝒕𝒊𝒐𝒏 𝒅𝒆 "%1"\n✧ ▬▭▬ ▭▬ ✦✧✦ ▬▭ ▬▭▬ ✧
-handlerEvents.onlyDeveloper=✧ ▬▭▬ ▬▬ ✦✧✦ ▬▬ ▬▬ ✧\n⚙️ | 𝑺𝒆𝒖𝒍 𝒍𝒆 𝑫𝒆𝒗𝒆𝒍𝒐𝒑𝒑𝒆𝒖𝒓 𝒅𝒖 𝒃𝒐𝒕 𝒑𝒆𝒖𝒕 𝒖𝒕𝒊𝒍𝒊𝒔𝒆𝒓 𝒍𝒂 𝒄𝒐𝒎𝒎𝒂𝒏𝒅𝒆 "%1"\n✧ ▬▭▬ ▭▬ ✦✧✦ ▬▭ ▬▭▬ ✧
-handlerEvents.onlyDeveloperToUseOnReply=✧ ▬▭▬ ▬▬ ✦✧✦ ▬▬ ▬▬ ✧\n⚙️ | 𝑺𝒆𝒖𝒍 𝒍𝒆 𝑫𝒆𝒗𝒆𝒍𝒐𝒑𝒑𝒆𝒖𝒓 𝒑𝒆𝒖𝒕 𝒖𝒕𝒊𝒍𝒊𝒔𝒆𝒓 𝒍𝒂 𝒓𝒆𝒑𝒐𝒏𝒔𝒆 𝒅𝒆 "%1"\n✧ ▬▭▬ ▭▬ ✦✧✦ ▬▭ ▬▭▬ ✧
-handlerEvents.onlyDeveloperToUseOnReaction=✧ ▬▭▬ ▬▬ ✦✧✦ ▬▬ ▬▬ ✧\n⚙️ | 𝑺𝒆𝒖𝒍 𝒍𝒆 𝑫𝒆𝒗𝒆𝒍𝒐𝒑𝒑𝒆𝒖𝒓 𝒑𝒆𝒖𝒕 𝒖𝒕𝒊𝒍𝒊𝒔𝒆𝒓 𝒍𝒂 𝒓𝒆𝒂𝒄𝒕𝒊𝒐𝒏 𝒅𝒆 "%1"\n✧ ▬▭▬ ▭▬ ✦✧✦ ▬▭ ▬▭▬ ✧
-handlerEvents.onlyVipUser=✧ ▬▭▬ ▬▬ ✦✧✦ ▬▬ ▬▬ ✧\n💎 | 𝑺𝒆𝒖𝒍𝒔 𝒍'𝑨𝒅𝒎𝒊𝒏𝑩𝒐𝒕 𝒆𝒕 𝒍𝒆 𝑫𝒆𝒗𝒆𝒍𝒐𝒑𝒑𝒆𝒖𝒓 𝒑𝒆𝒖𝒗𝒆𝒏𝒕 𝒖𝒕𝒊𝒍𝒊𝒔𝒆𝒓 𝒍𝒂 𝒄𝒐𝒎𝒎𝒂𝒏𝒅𝒆 "%1"\n✧ ▬▭▬ ▭▬ ✦✧✦ ▬▭ ▬▭▬ ✧
-handlerEvents.onlyVipUserToUseOnReply=✧ ▬▭▬ ▬▬ ✦✧✦ ▬▬ ▬▬ ✧\n💎 | 𝑺𝒆𝒖𝒍𝒔 𝒍'𝑨𝒅𝒎𝒊𝒏𝑩𝒐𝒕 𝒆𝒕 𝒍𝒆 𝑫𝒆𝒗𝒆𝒍𝒐𝒑𝒑𝒆𝒖𝒓 𝒑𝒆𝒖𝒗𝒆𝒏𝒕 𝒖𝒕𝒊𝒍𝒊𝒔𝒆𝒓 𝒍𝒂 𝒓𝒆𝒑𝒐𝒏𝒔𝒆 𝒅𝒆 "%1"\n✧ ▬▭▬ ▭▬ ✦✧✦ ▬▭ ▬▭▬ ✧
-handlerEvents.onlyVipUserToUseOnReaction=✧ ▬▭▬ ▬▬ ✦✧✦ ▬▬ ▬▬ ✧\n💎 | 𝑺𝒆𝒖𝒍𝒔 𝒍'𝑨𝒅𝒎𝒊𝒏𝑩𝒐𝒕 𝒆𝒕 𝒍𝒆 𝑫𝒆𝒗𝒆𝒍𝒐𝒑𝒑𝒆𝒖𝒓 𝒑𝒆𝒖𝒗𝒆𝒏𝒕 𝒖𝒕𝒊𝒍𝒊𝒔𝒆𝒓 𝒍𝒂 𝒓𝒆𝒂𝒄𝒕𝒊𝒐𝒏 𝒅𝒆 "%1"\n✧ ▬▭▬ ▭▬ ✦✧✦ ▬▭ ▬▭▬ ✧
-handlerEvents.waitingForCommand=✧ ▬▭▬ ▬▬ ✦✧✦ ▬▬ ▬▬ ✧\n⏱ 𝑽𝒐𝒖𝒔 𝒆̂𝒕𝒆𝒔 𝒅𝒂𝒏𝒔 𝒍𝒆 𝒕𝒆𝒎𝒑𝒔 𝒅’𝒂𝒕𝒕𝒆𝒏𝒕𝒆.\n» 𝑹𝒆𝒗𝒆𝒏𝒆𝒛 𝒂̀𝒑𝒓𝒆𝒔 %1𝒔\n✧ ▬▭▬ ▭▬ ✦✧✦ ▬▭ ▬▭▬ ✧
-handlerEvents.errorOccurred=✧ ▬▭▬ ▬▬ ✦✧✦ ▬▬ ▬▬ ✧\n❌ [ %1 ] 𝑬𝒓𝒓𝒆𝒖𝒓 𝒂̀ 𝒍𝒂 𝒄𝒐𝒎𝒎𝒂𝒏𝒅𝒆 "%2"\n\n%3\n✧ ▬▭▬ ▭▬ ✦✧✦ ▬▭ ▬▭▬ ✧
-handlerEvents.errorOccurred2=✧ ▬▭▬ ▬▬ ✦✧✦ ▬▬ ▬▬ ✧\n❌ [ %1 ] 𝑬𝒓𝒓𝒆𝒖𝒓 𝒐𝒏𝑪𝒉𝒂𝒕 𝒅𝒂𝒏𝒔 "%2"\n\n%3\n✧ ▬▭▬ ▭▬ ✦✧✦ ▬▭ ▬▭▬ ✧
-handlerEvents.errorOccurred3=✧ ▬▭▬ ▬▬ ✦✧✦ ▬▬ ▬▬ ✧\n❌ [ %1 ] 𝑬𝒓𝒓𝒆𝒖𝒓 𝒐𝒏𝑹𝒆𝒑𝒍𝒚 𝒅𝒂𝒏𝒔 "%2"\n\n%3\n✧ ▬▭▬ ▭▬ ✦✧✦ ▬▭ ▬▭▬ ✧
-handlerEvents.errorOccurred4=✧ ▬▭▬ ▬▬ ✦✧✦ ▬▬ ▬▬ ✧\n❌ [ %1 ] 𝑬𝒓𝒓𝒆𝒖𝒓 𝒐𝒏𝑹𝒆𝒂𝒄𝒕𝒊𝒐𝒏 𝒅𝒂𝒏𝒔 "%2"\n\n%3\n✧ ▬▭▬ ▭▬ ✦✧✦ ▬▭ ▬▭▬ ✧
-handlerEvents.errorOccurred5=✧ ▬▭▬ ▬▬ ✦✧✦ ▬▬ ▬▬ ✧\n❌ [ %1 ] 𝑬𝒓𝒓𝒆𝒖𝒓 𝒐𝒏𝑬𝒗𝒆𝒏𝒕 𝒅𝒂𝒏𝒔 "%2"\n\n%3\n✧ ▬▭▬ ▭▬ ✦✧✦ ▬▭ ▬▭▬ ✧
-handlerEvents.errorOccurred6=✧ ▬▭▬ ▬▬ ✦✧✦ ▬▬ ▬▬ ✧\n❌ [ %1 ] 𝑬𝒓𝒓𝒆𝒖𝒓 𝒐𝒏𝑬𝒗𝒆𝒏𝒕 𝒅𝒂𝒏𝒔 "%2"\n\n%3\n✧ ▬▭▬ ▭▬ ✦✧✦ ▬▭ ▬▭▬ ✧
-handlerEvents.errorOccurred7=✧ ▬▭▬ ▬▬ ✦✧✦ ▬▬ ▬▬ ✧\n❌ [ %1 ] 𝑬𝒓𝒓𝒆𝒖𝒓 𝒐𝒏𝑨𝒏𝒚𝑬𝒗𝒆𝒏𝒕 𝒅𝒂𝒏𝒔 "%2"\n\n%3\n✧ ▬▭▬ ▭▬ ✦✧✦ ▬▭ ▬▭▬ ✧
-handlerEvents.cannotFindCommandName=✧ ▬▭▬ ▬▬ ✦✧✦ ▬▬ ▬▬ ✧\n❌ 𝑰𝒎𝒑𝒐𝒔𝒔𝒊𝒃𝒍𝒆 𝒅𝒆 𝒕𝒓𝒐𝒖𝒗𝒆𝒓 𝒍𝒆 𝒏𝒐𝒎 𝒅𝒆 𝒍𝒂 𝒄𝒐𝒎𝒎𝒂𝒏𝒅𝒆 𝒑𝒐𝒖𝒓 𝒆𝒙𝒆́𝒄𝒖𝒕𝒆𝒓 𝒄𝒆𝒕𝒕𝒆 𝒓𝒆́𝒑𝒐𝒏𝒔𝒆\n✧ ▬▭▬ ▭▬ ✦✧✦ ▬▭ ▬▭▬ ✧
-handlerEvents.cannotFindCommand=✧ ▬▭▬ ▬▬ ✦✧✦ ▬▬ ▬▬ ✧\n❌ 𝑰𝒎𝒑𝒐𝒔𝒔𝒊𝒃𝒍𝒆 𝒅𝒆 𝒕𝒓𝒐𝒖𝒗𝒆𝒓 𝒍𝒂 𝒄𝒐𝒎𝒎𝒂𝒏𝒅𝒆 "%1" 𝒑𝒐𝒖𝒓 𝒄𝒆𝒕𝒕𝒆 𝒓𝒆́𝒑𝒐𝒏𝒔𝒆\n✧ ▬▭▬ ▭▬ ✦✧✦ ▬▭ ▬▭▬ ✧
+		// Anneau Électrique Lumineux
+		ctx.strokeStyle = themeColor;
+		ctx.lineWidth = 3;
+		ctx.beginPath(); ctx.arc(avatarX, avatarY, radius + 3, 0, Math.PI * 2); ctx.stroke();
+	} catch (e) {
+		ctx.fillStyle = themeColor;
+		ctx.beginPath(); ctx.arc(avatarX, avatarY, radius, 0, Math.PI * 2); ctx.fill();
+		ctx.fillStyle = '#ffffff';
+		ctx.font = 'bold 32px "Sans-Serif"';
+		ctx.textAlign = 'center';
+		ctx.fillText("⚠️", avatarX, avatarY + 11);
+	}
 
-# bot/autoUptime.js
-autoUptime.autoUptimeTurnedOn=Mode AutoUptime activé
+	ctx.textAlign = 'center';
 
-# database/controller/index.js
-indexController.connectingMongoDB=Connexion à une base de données MONGODB
-indexController.connectMongoDBSuccess=Connexion à la base de données MongoDB réussie !
-indexController.connectMongoDBError=✧ ▬▭▬ ▬▬ ✦✧✦ ▬▬ ▬▬ ✧\n❌ 𝑼𝒏𝒆 𝒆𝒓𝒓𝒆𝒖𝒓 𝒆𝒔𝒕 𝒔𝒖𝒓𝒗𝒆𝒏𝒖𝒆 𝒍𝒐𝒓𝒔 𝒅𝒆 𝒍𝒂 𝒄𝒐𝒏𝒏𝒆𝒙𝒊𝒐𝒏 𝒂̀ 𝑴 flavour𝑶𝑵𝑮𝑶𝑫𝑩 :\n✧ ▬▭▬ ▭▬ ✦✧✦ ▬▭ ▬▭▬ ✧
-indexController.connectingMySQL=Connexion à une base de données SQLITE
-indexController.connectMySQLSuccess=Connexion à la base de données SQLITE réussie !
-indexController.connectMySQLError=✧ ▬▭▬ ▬▬ ✦✧✦ ▬▬ ▬▬ ✧\n❌ 𝑼𝒏𝒆 𝒆𝒓𝒓𝒆𝒖𝒓 𝒆𝒔𝒕 𝒔𝒖𝒓𝒗𝒆𝒏𝒖𝒆 𝒍𝒐𝒓𝒔 𝒅𝒆 𝒍𝒂 𝒄𝒐𝒏𝒏𝒆𝒙𝒊𝒐𝒏 𝒂̀ 𝑺𝑸𝑳𝑰𝑻𝑬 :\n✧ ▬▭▬ ▭▬ ✦✧✦ ▬▭ ▬▭▬ ✧
+	// Badge d'état Supérieur (ex: COMMAND NOT FOUND)
+	ctx.fillStyle = themeColor;
+	ctx.fillRect(size / 2 - 90, 215, 180, 22);
+	ctx.fillStyle = '#ffffff';
+	ctx.font = 'bold 11px "Sans-Serif"';
+	ctx.fillText(errorType.toUpperCase(), size / 2, 230);
 
-# updater.js
-updater.updateTooFast=✧ ▬▭▬ ▬▬ ✦✧✦ ▬▬ ▬▬ ✧\n⚠️ 𝑽𝒆𝒖𝒊𝒍𝒍𝒆𝒛 𝒂𝒕𝒕𝒆𝒏𝒅𝒓𝒆 5 𝒎𝒊𝒏𝒖𝒕𝒆𝒔 𝒆𝒏𝒕𝒓𝒆 𝒍𝒆𝒔 𝒄𝒐𝒎𝒎𝒊𝒕𝒔.\n» 𝑻𝒆𝒎𝒑𝒔 𝒓𝒆𝒔𝒕𝒂𝒏𝒕 : %1 𝒎𝒊𝒏 %2 𝒔𝒆𝒄\n✧ ▬▭▬ ▭▬ ✦✧✦ ▬▭ ▬▭▬ ✧
-updater.latestVersion=Vous utilisez la dernière version
-updater.cantFindVersion=✧ ▬▭▬ ▬▬ ✦✧✦ ▬▬ ▬▬ ✧\n❌ 𝑽𝒆𝒓𝒔𝒊𝒐𝒏 𝒏𝒐𝒏 𝒅𝒆́𝒇𝒊𝒏𝒊𝒆 (%1). 𝑽𝒆́𝒓𝒊𝒇𝒊𝒆𝒛 𝒗𝒐𝒕𝒓𝒆 𝒑𝒂𝒄𝒌𝒂𝒈𝒆.𝒋𝒔𝒐𝒏\n✧ ▬▭▬ ▭▬ ✦✧✦ ▬▭ ▬▭▬ ✧
-updater.newVersions=Il y a %1 nouvelles versions à mettre à jour, démarrage de la mise à jour...
-updater.updateSuccess=Mise à jour réussie%1
-updater.configChanged=⚠️ Le fichier %1 a été modifié, veuillez vérifier votre config.json
-updater.installingPackages=Installation des dépendances du bot...
-updater.installSuccess=Dépendances installées avec succès, redémarrez le bot pour utiliser la nouvelle version
-updater.backupSuccess=Fichiers modifiés sauvegardés avec succès, consultez le dossier %1
-updater.restartToApply=. Redémarrez le bot pour appliquer la nouvelle version
-updater.skipFile=Fichier %1 ignoré lors de la mise à jour (commentaire %2 trouvé)
+	// Titre de l'erreur
+	ctx.fillStyle = '#ffffff';
+	ctx.font = 'bold 22px "Sans-Serif"';
+	ctx.fillText(title.toUpperCase(), size / 2, 280);
 
-# dashboard/routes/verifyfbid.js
-verifyfbid.sendCode=Votre code de vérification est :\n%1\nLe code de vérification est valable pendant %2 minutes
+	// Ligne d'analyse technologique
+	ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+	ctx.lineWidth = 1;
+	ctx.beginPath(); ctx.moveTo(60, 305); ctx.lineTo(size - 60, 305); ctx.stroke();
 
-# utils.js
-utils.errorOccurred=✧ ▬▭▬ ▬▬ ✦✧✦ ▬▬ ▬▬ ✧\n❌ 𝑼𝒏𝒆 𝒆𝒓𝒓𝒆𝒖𝒓 𝒆𝒔𝒕 𝒔𝒖𝒓𝒗𝒆𝒏𝒖𝒆 :\n\n%1\n✧ ▬▭▬ ▭▬ ✦✧✦ ▬▭ ▬▭▬ ✧
+	// Zone de log textuelle imbriquée
+	ctx.fillStyle = 'rgba(255, 255, 255, 0.02)';
+	ctx.fillRect(45, 325, 510, 190);
+	ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+	ctx.strokeRect(45, 325, 510, 190);
 
-# for command
-command.restartedBot=Le bot a été redémarré
+	// Remplissage du rapport d'erreur / de la syntaxe attendue
+	ctx.fillStyle = '#a0aec0';
+	ctx.font = '14px "Sans-Serif"';
+	const cleanLog = logMessage.replace(/[\n\r]+/g, ' ');
+	wrapText(ctx, cleanLog, 65, 360, 470, 24);
 
-# dashboard/app.js
-app.googleApiRefreshTokenExpired=✧ ▬▭▬ ▬▬ ✦✧✦ ▬▬ ▬▬ ✧\n❌ 𝑻𝒐𝒌𝒆𝒏 𝒓𝒆́𝒗𝒐𝒒𝒖𝒆́/𝒆𝒙𝒑𝒊𝒓𝒆́. 𝑨𝒄𝒄𝒆́𝒅𝒆𝒛 𝒂̀ : https://developers.google.com/oauthplayground/\n✧ ▬▭▬ ▭▬ ✦✧✦ ▬▭ ▬▭▬ ✧
-app.tooManyRequests=✧ ▬▭▬ ▬▬ ✦✧✦ ▬▬ ▬▬ ✧\n❌ 𝑻𝒓𝒐𝒑 𝒅𝒆 𝒓𝒆𝒒𝒖𝒆̂𝒕𝒆𝒔 𝒆𝒏𝒗𝒐𝒚𝒆́𝒆𝒔. 𝑽𝒆𝒖𝒊𝒍𝒍𝒆𝒛 𝒓𝒆́𝒆𝒔𝒔𝒂𝒚𝒆𝒓 𝒑𝒍𝒖𝒔 𝒕𝒂𝒓𝒅.\n✧ ▬▭▬ ▭▬ ✦✧✦ ▬▭ ▬▭▬ ✧
-app.notPermissionChangeFbstate=✧ ▬▭▬ ▬▬ ✦✧✦ ▬▬ ▬▬ ✧\n❌ 𝑽𝒐𝒖𝒔 𝒏’𝒂𝒗𝒆𝒛 𝒑𝒂𝒔 𝒍𝒂 𝒑𝒆𝒓𝒎𝒊𝒔𝒔𝒊𝒐𝒏 𝒅𝒆 𝒎𝒐𝒅𝒊𝒇𝒊𝒆𝒓 𝒇𝒃𝒔𝒕𝒂𝒕𝒆 !\n✧ ▬▭▬ ▭▬ ✦✧✦ ▬▭ ▬▭▬ ✧
-app.notFoundFbstate=✧ ▬▭▬ ▬▬ ✦✧✦ ▬▬ ▬▬ ✧\n❌ 𝑽𝒆𝒖𝒊𝒍𝒍𝒆𝒛 𝒆𝒏𝒕𝒓𝒆𝒓 𝒇𝒃𝒔𝒕𝒂𝒕𝒆 !\n✧ ▬▭▬ ▭▬ ✦✧✦ ▬▭ ▬▭▬ ✧
-app.changedFbstateSuccess=fbstate modifié avec succès !
-app.serverError=✧ ▬▭▬ ▬▬ ✦✧✦ ▬▬ ▬▬ ✧\n❌ 𝑬𝒓𝒓𝒆𝒖𝒓 𝒊𝒏𝒕𝒆𝒓𝒏𝒆 𝒅𝒆𝒔 𝒔𝒆𝒓𝒗𝒆𝒖𝒓𝒔, 𝒗𝒆𝒖𝒊𝒍𝒍𝒆𝒛 𝒓𝒆́𝒆𝒔𝒔𝒂𝒚𝒆𝒓 𝒖𝒍𝒕𝒆́𝒓𝒊𝒆𝒖𝒓𝒆𝒎𝒆𝒏𝒕.\n✧ ▬▭▬ ▭▬ ✦✧✦ ▬▭ ▬▭▬ ✧
+	// Footer Signature matricielle
+	ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
+	ctx.font = 'bold 11px "Sans-Serif"';
+	ctx.fillText("» CORE ENGINE DIAGNOSTIC PROTOCOL V4.0 «", size / 2, size - 30);
+
+	const tmpDir = path.join(__dirname, 'cache');
+	await fs.ensureDir(tmpDir);
+	const imgPath = path.join(tmpDir, `sys_err_${Date.now()}_${userId}.png`);
+	fs.writeFileSync(imgPath, canvas.toBuffer('image/png'));
+	return imgPath;
+}
+
+module.exports = {
+	config: {
+		name: "syserr",
+		version: "4.0",
+		author: "NTKhang x Célestin",
+		countDown: 2,
+		role: 0,
+		category: "system"
+	},
+
+	onStart: async function ({ message }) {
+		return message.reply("⚙️ Le système de traçage graphique des erreurs est actif sur ce noyau.");
+	},
+
+	onChat: async function ({ event, message, usersData }) {
+		if (!event.body) return;
+		const prefix = global.GoatBot.config.prefix;
+
+		if (event.body.startsWith(prefix)) {
+			const args = event.body.slice(prefix.length).trim().split(/ +/);
+			const commandName = args.shift().toLowerCase();
+
+			// Interception si la commande demandée n'existe pas dans le registre global
+			if (!global.GoatBot.commands.has(commandName)) {
+				const uid = event.senderID;
+				const userData = await usersData.get(uid);
+				const userName = userData.name || "Utilisateur";
+
+				const details = `La commande "${commandName}" n'est pas configurée ou reste introuvable. Utilisez ${prefix}help pour obtenir l'index des commandes autorisées.`;
+				
+				const imgPath = await generateSystemErrorCanvas(uid, "COMMAND NOT FOUND", `ERREUR MODULE: [ ${commandName} ]`, details, "#ff2a5f");
+				
+				// 1. Envoi du rapport graphique d'erreur (Canvas)
+				return message.reply({
+					body: `❌ Commande introuvable. Analyse du routage en cours...`,
+					attachment: fs.createReadStream(imgPath)
+				}, async () => {
+					// Suppression du fichier temporaire après envoi
+					if (fs.existsSync(imgPath)) fs.unlinkSync(imgPath);
+					
+					// 2. Envoi du message textuel encadré avec mention de l'utilisateur
+					const responseText = `✧ ▬▭▬ ▬▭▬ ✦✧✦ ▬▭▬ ▬▭▬ ✧\n⚠️ Attention @${userName}, la commande saisie est introuvable.\n» Entrez la commande *${prefix}help* pour afficher la liste des modules.\n✧ ▬▭▬ ▬▭▬ ✦✧✦ ▬▭▬ ▬▭▬ ✧`;
+					
+					await message.reply({
+						body: responseText,
+						mentions: [{
+							tag: `@${userName}`,
+							id: uid
+						}]
+					});
+				});
+			}
+		}
+	}
+};
