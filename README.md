@@ -1,5 +1,5 @@
 <p align="center">
-  ✨ <code>👑 Created with Magic by Celestin 👑</code> ✨
+  <img src="https://readme-typing-svg.demolab.com?font=Impact&size=22&pause=2000&color=D4AF37&center=true&vCenter=true&width=600&lines=%E2%9C%A8+Created+with+Magic+by+Celestin+%E2%9C%A8" alt="Created by Celestin" />
 </p>
 
 <p align="center">
