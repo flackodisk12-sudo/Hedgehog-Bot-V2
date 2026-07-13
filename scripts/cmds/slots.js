@@ -3,7 +3,7 @@ const MAX_BET = 6000000;
 
 module.exports = {
   config: {
-    name: "slots",
+    name: "slot",
     aliases: ["slot"],
     version: "1.4",
     author: "Christus",
