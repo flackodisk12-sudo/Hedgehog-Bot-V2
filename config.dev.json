@@ -24,7 +24,7 @@
     "whiteListIds": [],
     "notes": "if you enable this feature, only the ids in the whiteListIds section can use the bot"
   },
-  "nickNameBot": "➤『 𝙲𝚊𝚜𝚜𝚞𝚍𝚢 𝄞𝙶𝙿𝚃 』☜ヅ",
+  "nickNameBot": "➤『  𝑪𝒂𝒔𝒔𝒊𝒅𝒚-𝒃𝒐𝒕』☜ヅ",
   "prefix": "-",
   "database": {
     "type": "sqlite",
