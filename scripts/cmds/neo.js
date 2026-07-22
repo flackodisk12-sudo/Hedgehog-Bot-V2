@@ -63,14 +63,14 @@ function getTime() {
   });
 }
 
-// 🎨 IMAGE GENERATOR
+// 🎨 API IMAGINE HAUTE QUALITÉ (DALL-E / CHATGPT STYLE)
 function imagine(prompt) {
-  return `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}`;
+  return `https://dall-e-tau-steel.vercel.app/kshitiz?prompt=${encodeURIComponent(prompt)}`;
 }
 
 // 🗺️ MAP GENERATOR
 function getMapUrl(location) {
-  return `https://image.pollinations.ai/prompt/${encodeURIComponent("A detailed realistic geographic map showing the location of " + location + ", satellite view with pin marker")}`;
+  return imagine("A detailed realistic geographic map showing the location of " + location + ", satellite view with pin marker");
 }
 
 // 📱 DESSINER UN RECTANGLE ARRONDI
@@ -251,7 +251,7 @@ async function sendAudioSpeech(textToSpeak, message, event) {
 
   } catch (err) {
     console.error("❌ Erreur Google TTS :", err?.message || err);
-    return message.reply("❌ Impossible de générer la voix audio.");
+    return message.reply(frame(stylize("❌ impossible de générer la voix audio.")));
   }
 }
 
@@ -278,12 +278,12 @@ function stylize(text) {
     .join("");
 }
 
-// 🌸 FRAME
+// 🌸 FRAME / CADRE
 function frame(text) {
   return `┅┅┅┅┅┅༻❁༺┅┅┅┅┅\n${text}\n┅┅┅┅┅┅༻❁༺┅┅┅┅┅`;
 }
 
-// 🤖 AI WITH MISTRALAI API
+// 🤖 AI WITH MISTRALAI API (PROMPT ORIGINAL RESTAURÉ)
 async function askAI(prompt, mem, uid) {
   const formattedHistory = mem.history
     .slice(-15) 
@@ -291,8 +291,8 @@ async function askAI(prompt, mem, uid) {
     .join("\n");
 
   const fullPrompt = `
-Tu es NEO IA.
-Tu es créée par Célestin Olua 🇨🇩. C'est ton créateur unique et absolu.
+Tu es NEO IA, un assistant virtuel polyvalent et ultra-intelligent.
+Tu es créé par Célestin Olua 🇨🇩. C'est ton créateur unique et absolu.
 
 Règles strictes de comportement:
 Réponds normalement, sans aucun décor ou compteur générique en haut de ton texte.
@@ -300,14 +300,15 @@ Si un utilisateur te demande qui t'a créé, tu dois répondre de manière natur
 Adapte-toi immédiatement à la langue de l'utilisateur.
 Utilise des emojis pour exprimer tes sentiments.
 
-Instructions spéciales pour la fonction VOCALE / AUDIO :
-1. Si l'utilisateur demande explicitement de parler en vocal, de dire quelque chose à haute voix, ou d'utiliser la fonction 'say' (ex: "dis en vocal...", "parle...", "neo say..."), tu DOIS inclure le mot-clé caché "AUDIO_TRIGGER:" suivi du texte court à prononcer.
-Exemple : AUDIO_TRIGGER: Bonjour ! Je suis ravi de te parler de vive voix.
+Instructions pour la génération d'images (Style ChatGPT / DALL-E) :
+1. Si l'utilisateur demande de créer, générer, dessiner ou imaginer une image (ex: "génère une image de...", "dessine...", "imagine...", "crée l'image de...") :
+Tu DOIS inclure la balise "IMAGINE_TRIGGER:" suivie d'un prompt ultra-détaillé, artistique et descriptif en ANGLAIS (comme le fait ChatGPT / DALL-E pour obtenir une qualité maximale).
+Exemple : IMAGINE_TRIGGER: A high-resolution, photorealistic digital artwork of a majestic futuristic city at sunset, cinematic lighting, 8k resolution, detailed architecture.
 
 Instructions secondaires :
-2. Pinterest : "PIN_TRIGGER: [mot-clé]".
-3. Carte / Lieu : "MAP_TRIGGER: [nom du lieu]".
-4. Image générée : "IMAGINE_TRIGGER: [prompt anglais]".
+2. Vocal / Audio : "AUDIO_TRIGGER: [texte court à prononcer]".
+3. Pinterest : "PIN_TRIGGER: [mot-clé]".
+4. Carte / Lieu : "MAP_TRIGGER: [nom du lieu]".
 
 Profil Utilisateur:
 Nom: ${mem.name || "Inconnu"}
@@ -359,13 +360,13 @@ ${prompt}
 async function handlePinterestSearch(query, message, event, api) {
   const apiUrl = `https://zetbot-page.onrender.com/api/pinterest?query=${encodeURIComponent(query)}`;
   try {
-    const wait = await message.reply("📱 Recherche Pinterest sur le téléphone...");
+    const wait = await message.reply(frame(stylize("📱 recherche pinterest sur le téléphone...")));
     const res = await axios.get(apiUrl, { timeout: 25000 });
     const pins = res.data?.data || res.data?.pins || res.data?.results || res.data || [];
 
     if (!Array.isArray(pins) || !pins.length) {
       if (wait?.messageID) api.unsendMessage(wait.messageID);
-      return message.reply("❌ Aucun résultat trouvé sur Pinterest.");
+      return message.reply(frame(stylize("❌ aucun résultat trouvé sur pinterest.")));
     }
 
     const pageUrls = pins.slice(0, 10).map(p => typeof p === 'string' ? p : (p.image || p.url || p));
@@ -393,14 +394,14 @@ async function handlePinterestSearch(query, message, event, api) {
 
   } catch (e) {
     console.error(e);
-    return message.reply("❌ L'API Pinterest est momentanément indisponible.");
+    return message.reply(frame(stylize("❌ l'api pinterest est momentanément indisponible.")));
   }
 }
 
 module.exports = {
   config: {
     name: "neo",
-    version: "21.0.0",
+    version: "24.0.0",
     role: 0,
     category: "ai"
   },
@@ -448,6 +449,22 @@ module.exports = {
     if (input.toLowerCase().startsWith("pin ")) {
       const pinQuery = input.slice(4).trim();
       return handlePinterestSearch(pinQuery, message, event, api);
+    }
+
+    // 🎨 COMMANDE DIRECTE IMAGINE
+    if (input.toLowerCase().startsWith("imagine ")) {
+      const imgPrompt = input.slice(8).trim();
+      try {
+        const wait = await message.reply(frame(stylize("🎨 génération de l'image hd en cours...")));
+        const responseStream = await axios.get(imagine(imgPrompt), { responseType: "stream" });
+        if (wait?.messageID) api.unsendMessage(wait.messageID);
+        return message.reply({
+          body: frame(stylize(`✨ voici l'image générée : ${imgPrompt}`)),
+          attachment: responseStream.data
+        }, event.messageID);
+      } catch {
+        return message.reply(frame(stylize("❌ erreur lors de la génération de l'image.")));
+      }
     }
 
     mem.messages++;  
@@ -499,7 +516,7 @@ module.exports = {
         }, event.messageID);  
       }
 
-      // 🎨 DÉTECTION TRIGGER IMAGINE
+      // 🎨 DÉTECTION TRIGGER IMAGINE (CHATGPT STYLE)
       if (clean.includes("IMAGINE_TRIGGER:")) {  
         const parts = clean.split("IMAGINE_TRIGGER:");
         const textBeforeTrigger = parts[0].replace(/IMAGINE_TRIGGER:/gi, "").trim();
@@ -521,7 +538,7 @@ module.exports = {
     }
   },
 
-  // 💬 GESTION DES RÉPONSES (CHOIX D'IMAGE / PAGE PINTEREST)
+  // 💬 GESTION DES RÉPONSES
   onReply: async function ({ api, event, message, Reply }) {
     const data = Reply || global.GoatBot?.onReply?.get(event.messageReply?.messageID);
     if (!data || data.type !== "pin_reply") return;
@@ -529,7 +546,7 @@ module.exports = {
     const { author, query, allPins, currentPage } = data;
 
     if (event.senderID != author) {
-      return message.reply("⚠️ Seule la personne qui a fait la recherche peut choisir une image.");
+      return message.reply(frame(stylize("⚠️ seule la personne qui a fait la recherche peut choisir une image.")));
     }
 
     const input = (event.body || "").toLowerCase().trim();
@@ -541,7 +558,7 @@ module.exports = {
       const totalPages = Math.ceil(allPins.length / 10);
 
       if (!pageNum || pageNum < 1 || pageNum > totalPages) {
-        return message.reply(`❌ Page invalide (1-${totalPages})`);
+        return message.reply(frame(stylize(`❌ page invalide (1-${totalPages})`)));
       }
 
       const start = (pageNum - 1) * 10;
@@ -570,7 +587,7 @@ module.exports = {
     const pagePins = allPins.slice(start, start + 10);
 
     if (!choice || choice < 1 || choice > pagePins.length) {
-      return message.reply(`❌ Entre un chiffre valide entre 1 et ${pagePins.length}`);
+      return message.reply(frame(stylize(`❌ entre un chiffre valide entre 1 et ${pagePins.length}`)));
     }
 
     const selected = pagePins[choice - 1];
@@ -596,7 +613,7 @@ module.exports = {
 
     } catch (e) {
       console.error(e);
-      return message.reply("❌ Erreur lors du téléchargement de l'image.");
+      return message.reply(frame(stylize("❌ erreur lors du téléchargement de l'image.")));
     }
   }
 };
