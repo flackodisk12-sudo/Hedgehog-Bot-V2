@@ -1,5 +1,5 @@
 const axios = require("axios");
-const fs = require("fs");
+const fs = require("fs-extra");
 const path = require("path");
 const os = require("os");
 const { createCanvas, loadImage } = require("canvas");
@@ -63,14 +63,25 @@ function getTime() {
   });
 }
 
-// 🎨 API IMAGINE HAUTE QUALITÉ (DALL-E / CHATGPT STYLE)
-function imagine(prompt) {
-  return `https://dall-e-tau-steel.vercel.app/kshitiz?prompt=${encodeURIComponent(prompt)}`;
+// 🎨 API IMAGINE ADAPTÉE DE LA STRUCTURE GENX (DALL-E)
+async function generateImage(prompt) {
+  const response = await axios.get(`https://dall-e-tau-steel.vercel.app/kshitiz?prompt=${encodeURIComponent(prompt)}`);
+  const imageUrl = response.data.response;
+
+  if (!imageUrl) {
+    throw new Error("L'API n'a renvoyé aucun lien d'image.");
+  }
+
+  const imgResponse = await axios.get(imageUrl, { responseType: "arraybuffer" });
+  const imgPath = path.join(os.tmpdir(), `genx_dalle_${Date.now()}.jpg`);
+  await fs.outputFile(imgPath, imgResponse.data);
+  return imgPath;
 }
 
 // 🗺️ MAP GENERATOR
-function getMapUrl(location) {
-  return imagine("A detailed realistic geographic map showing the location of " + location + ", satellite view with pin marker");
+async function getMapImage(location) {
+  const prompt = `A detailed realistic geographic map showing the location of ${location}, satellite view with pin marker`;
+  return await generateImage(prompt);
 }
 
 // 📱 DESSINER UN RECTANGLE ARRONDI
@@ -215,11 +226,11 @@ async function createPhoneCatalogueCanvas(imagesUrls, query, page) {
   ctx.restore();
 
   const cachePath = path.join(os.tmpdir(), `pin_phone_${Date.now()}.png`);
-  fs.writeFileSync(cachePath, canvas.toBuffer("image/png"));
+  await fs.outputFile(cachePath, canvas.toBuffer("image/png"));
   return cachePath;
 }
 
-// 🔊 FONCTION VOCALE SAY CORRIGÉE ET STABLE
+// 🔊 FONCTION VOCALE SAY
 async function sendAudioSpeech(textToSpeak, message, event) {
   try {
     const cleanSpeech = textToSpeak.substring(0, 200);
@@ -240,7 +251,7 @@ async function sendAudioSpeech(textToSpeak, message, event) {
       }
     });
 
-    fs.writeFileSync(tempPath, Buffer.from(res.data));
+    await fs.outputFile(tempPath, Buffer.from(res.data));
 
     return message.reply({
       body: frame(stylize(`🎙️ message vocal : ${cleanSpeech}`)),
@@ -255,10 +266,10 @@ async function sendAudioSpeech(textToSpeak, message, event) {
   }
 }
 
-// 🧹 CLEAN TEXT (FILTRE POUR RETIRER LES LIENS HTTP/HTTPS)
+// 🧹 CLEAN TEXT
 function cleanText(text) {
   return (text || "")
-    .replace(/https?:\/\/\S+/gi, "") // Supprime les URLs
+    .replace(/https?:\/\/\S+/gi, "")
     .replace(/\?/g, "")
     .replace(/\n\s*\n/g, "\n")
     .trim();
@@ -302,10 +313,10 @@ Ne mets AUCUN lien web dans tes réponses textuelles.
 Adapte-toi immédiatement à la langue de l'utilisateur.
 Utilise des emojis pour exprimer tes sentiments.
 
-Instructions pour la génération d'images (Style ChatGPT / DALL-E) :
+Instructions pour la génération d'images :
 1. Si l'utilisateur demande de créer, générer, dessiner ou imaginer une image (ex: "génère une image de...", "dessine...", "imagine...", "crée l'image de...") :
-Tu DOIS inclure la balise "IMAGINE_TRIGGER:" suivie d'un prompt ultra-détaillé, artistique et descriptif en ANGLAIS.
-Exemple : IMAGINE_TRIGGER: A high-resolution, photorealistic digital artwork of a majestic futuristic city at sunset, cinematic lighting, 8k resolution, detailed architecture.
+Tu DOIS inclure la balise "IMAGINE_TRIGGER:" suivie d'un prompt ultra-détaillé et descriptif en ANGLAIS.
+Exemple : IMAGINE_TRIGGER: A high-resolution, photorealistic digital artwork of a majestic futuristic city at sunset, cinematic lighting, 8k resolution.
 
 Instructions secondaires :
 2. Vocal / Audio : "AUDIO_TRIGGER: [texte court à prononcer]".
@@ -403,7 +414,7 @@ async function handlePinterestSearch(query, message, event, api) {
 module.exports = {
   config: {
     name: "neo",
-    version: "25.0.0",
+    version: "27.0.0",
     role: 0,
     category: "ai"
   },
@@ -441,13 +452,13 @@ module.exports = {
       mem.name = input.replace(/mon nom est/i, "").trim();
     }  
 
-    // 🔊 COMMANDE DIRECTE VOCALE (neo say <texte>)
+    // 🔊 COMMANDE DIRECTE VOCALE
     if (input.toLowerCase().startsWith("say ")) {
       const sayText = input.slice(4).trim();
       return sendAudioSpeech(sayText, message, event);
     }
 
-    // 📌 COMMANDE DIRECTE PINTEREST (neo pin <recherche>)
+    // 📌 COMMANDE DIRECTE PINTEREST
     if (input.toLowerCase().startsWith("pin ")) {
       const pinQuery = input.slice(4).trim();
       return handlePinterestSearch(pinQuery, message, event, api);
@@ -456,15 +467,21 @@ module.exports = {
     // 🎨 COMMANDE DIRECTE IMAGINE
     if (input.toLowerCase().startsWith("imagine ")) {
       const imgPrompt = input.slice(8).trim();
+      let waitMsg = null;
       try {
-        const wait = await message.reply(frame(stylize("🎨 génération de l'image hd en cours...")));
-        const responseStream = await axios.get(imagine(imgPrompt), { responseType: "stream" });
-        if (wait?.messageID) api.unsendMessage(wait.messageID);
+        api.setMessageReaction("✅", event.messageID, () => {}, true);
+        waitMsg = await message.reply(frame(stylize("🎨 génération de l'image hd en cours...")));
+        const imgPath = await generateImage(imgPrompt);
+        if (waitMsg?.messageID) try { api.unsendMessage(waitMsg.messageID); } catch {}
         return message.reply({
           body: frame(stylize(`✨ voici l'image générée : ${imgPrompt}`)),
-          attachment: responseStream.data
+          attachment: fs.createReadStream(imgPath)
+        }, () => {
+          if (fs.existsSync(imgPath)) fs.unlinkSync(imgPath);
         }, event.messageID);
-      } catch {
+      } catch (err) {
+        if (waitMsg?.messageID) try { api.unsendMessage(waitMsg.messageID); } catch {}
+        console.error("Error generating image:", err);
         return message.reply(frame(stylize("❌ erreur lors de la génération de l'image.")));
       }
     }
@@ -484,7 +501,7 @@ module.exports = {
         .replace(/openai/gi, "Célestin Olua")
         .replace(/mistral/gi, "NEO");
 
-      // 🔊 DÉTECTION TRIGGER AUDIO (VOCAL)
+      // 🔊 DÉTECTION TRIGGER AUDIO
       if (rawReply.includes("AUDIO_TRIGGER:")) {  
         const parts = rawReply.split("AUDIO_TRIGGER:");
         const textToSpeak = parts[1].trim();  
@@ -504,24 +521,38 @@ module.exports = {
         const textBeforeTrigger = cleanText(parts[0].replace(/MAP_TRIGGER:/gi, ""));
         const locationPrompt = parts[1].trim();  
         
-        const responseStream = await axios.get(getMapUrl(locationPrompt), { responseType: "stream" });
-        return message.reply({  
-          body: frame(stylize(textBeforeTrigger || "📍 voici la carte de la localisation")),  
-          attachment: responseStream.data  
-        }, event.messageID);  
+        try {
+          const imgPath = await getMapImage(locationPrompt);
+          return message.reply({  
+            body: frame(stylize(textBeforeTrigger || "📍 voici la carte de la localisation")),  
+            attachment: fs.createReadStream(imgPath)  
+          }, () => {
+            if (fs.existsSync(imgPath)) fs.unlinkSync(imgPath);
+          }, event.messageID);  
+        } catch {
+          return message.reply(frame(stylize("❌ impossible d'afficher la carte.")), event.messageID);
+        }
       }
 
-      // 🎨 DÉTECTION TRIGGER IMAGINE (CHATGPT STYLE)
+      // 🎨 DÉTECTION TRIGGER IMAGINE
       if (rawReply.includes("IMAGINE_TRIGGER:")) {  
         const parts = rawReply.split("IMAGINE_TRIGGER:");
         const textBeforeTrigger = cleanText(parts[0].replace(/IMAGINE_TRIGGER:/gi, ""));
         const imagePrompt = parts[1].trim();  
         
-        const responseStream = await axios.get(imagine(imagePrompt), { responseType: "stream" });
-        return message.reply({  
-          body: frame(stylize(textBeforeTrigger || "🎨 voici l'image générée")),  
-          attachment: responseStream.data  
-        }, event.messageID);  
+        try {
+          api.setMessageReaction("✅", event.messageID, () => {}, true);
+          const imgPath = await generateImage(imagePrompt);
+          return message.reply({  
+            body: frame(stylize(textBeforeTrigger || "🎨 voici l'image générée")),  
+            attachment: fs.createReadStream(imgPath)  
+          }, () => {
+            if (fs.existsSync(imgPath)) fs.unlinkSync(imgPath);
+          }, event.messageID);  
+        } catch (err) {
+          console.error("Error generating image:", err);
+          return message.reply(frame(stylize("❌ erreur lors de la génération d'image.")), event.messageID);
+        }
       }  
 
       const clean = cleanText(rawReply);
@@ -603,7 +634,7 @@ module.exports = {
         timeout: 20000
       });
 
-      fs.writeFileSync(imgPath, Buffer.from(img.data));
+      await fs.outputFile(imgPath, Buffer.from(img.data));
 
       return api.sendMessage({
         body: frame(stylize(`✨ voici l'image n°${choice} en hd !`)),
