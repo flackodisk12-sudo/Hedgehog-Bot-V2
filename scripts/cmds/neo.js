@@ -255,9 +255,10 @@ async function sendAudioSpeech(textToSpeak, message, event) {
   }
 }
 
-// 🧹 CLEAN TEXT
+// 🧹 CLEAN TEXT (FILTRE POUR RETIRER LES LIENS HTTP/HTTPS)
 function cleanText(text) {
   return (text || "")
+    .replace(/https?:\/\/\S+/gi, "") // Supprime les URLs
     .replace(/\?/g, "")
     .replace(/\n\s*\n/g, "\n")
     .trim();
@@ -283,7 +284,7 @@ function frame(text) {
   return `┅┅┅┅┅┅༻❁༺┅┅┅┅┅\n${text}\n┅┅┅┅┅┅༻❁༺┅┅┅┅┅`;
 }
 
-// 🤖 AI WITH MISTRALAI API (PROMPT ORIGINAL RESTAURÉ)
+// 🤖 AI WITH MISTRALAI API
 async function askAI(prompt, mem, uid) {
   const formattedHistory = mem.history
     .slice(-15) 
@@ -297,12 +298,13 @@ Tu es créé par Célestin Olua 🇨🇩. C'est ton créateur unique et absolu.
 Règles strictes de comportement:
 Réponds normalement, sans aucun décor ou compteur générique en haut de ton texte.
 Si un utilisateur te demande qui t'a créé, tu dois répondre de manière naturelle que tu as été créé par Célestin Olua 😏.
+Ne mets AUCUN lien web dans tes réponses textuelles.
 Adapte-toi immédiatement à la langue de l'utilisateur.
 Utilise des emojis pour exprimer tes sentiments.
 
 Instructions pour la génération d'images (Style ChatGPT / DALL-E) :
 1. Si l'utilisateur demande de créer, générer, dessiner ou imaginer une image (ex: "génère une image de...", "dessine...", "imagine...", "crée l'image de...") :
-Tu DOIS inclure la balise "IMAGINE_TRIGGER:" suivie d'un prompt ultra-détaillé, artistique et descriptif en ANGLAIS (comme le fait ChatGPT / DALL-E pour obtenir une qualité maximale).
+Tu DOIS inclure la balise "IMAGINE_TRIGGER:" suivie d'un prompt ultra-détaillé, artistique et descriptif en ANGLAIS.
 Exemple : IMAGINE_TRIGGER: A high-resolution, photorealistic digital artwork of a majestic futuristic city at sunset, cinematic lighting, 8k resolution, detailed architecture.
 
 Instructions secondaires :
@@ -401,7 +403,7 @@ async function handlePinterestSearch(query, message, event, api) {
 module.exports = {
   config: {
     name: "neo",
-    version: "24.0.0",
+    version: "25.0.0",
     role: 0,
     category: "ai"
   },
@@ -474,9 +476,7 @@ module.exports = {
 
     try {  
       const reply = await askAI(input, mem, uid);  
-      let clean = cleanText(reply);  
-
-      clean = clean
+      let rawReply = reply
         .replace(/microsoft/gi, "Célestin Olua")
         .replace(/copilot/gi, "NEO")
         .replace(/bing/gi, "NEO")
@@ -484,29 +484,24 @@ module.exports = {
         .replace(/openai/gi, "Célestin Olua")
         .replace(/mistral/gi, "NEO");
 
-      mem.history.push({ sender: "bot", text: clean, time: now });
-      mem.history = mem.history.filter(h => now - h.time <= MEMORY_TIME);  
-      if (mem.history.length > 400) mem.history.shift();  
-      setMem(uid, mem);  
-
       // 🔊 DÉTECTION TRIGGER AUDIO (VOCAL)
-      if (clean.includes("AUDIO_TRIGGER:")) {  
-        const parts = clean.split("AUDIO_TRIGGER:");
+      if (rawReply.includes("AUDIO_TRIGGER:")) {  
+        const parts = rawReply.split("AUDIO_TRIGGER:");
         const textToSpeak = parts[1].trim();  
         return sendAudioSpeech(textToSpeak, message, event);
       }  
 
       // 📌 DÉTECTION TRIGGER PIN
-      if (clean.includes("PIN_TRIGGER:")) {
-        const parts = clean.split("PIN_TRIGGER:");
+      if (rawReply.includes("PIN_TRIGGER:")) {
+        const parts = rawReply.split("PIN_TRIGGER:");
         const pinQuery = parts[1].trim();
         return handlePinterestSearch(pinQuery, message, event, api);
       }
 
       // 🗺️ DÉTECTION TRIGGER MAP
-      if (clean.includes("MAP_TRIGGER:")) {  
-        const parts = clean.split("MAP_TRIGGER:");
-        const textBeforeTrigger = parts[0].replace(/MAP_TRIGGER:/gi, "").trim();
+      if (rawReply.includes("MAP_TRIGGER:")) {  
+        const parts = rawReply.split("MAP_TRIGGER:");
+        const textBeforeTrigger = cleanText(parts[0].replace(/MAP_TRIGGER:/gi, ""));
         const locationPrompt = parts[1].trim();  
         
         const responseStream = await axios.get(getMapUrl(locationPrompt), { responseType: "stream" });
@@ -517,9 +512,9 @@ module.exports = {
       }
 
       // 🎨 DÉTECTION TRIGGER IMAGINE (CHATGPT STYLE)
-      if (clean.includes("IMAGINE_TRIGGER:")) {  
-        const parts = clean.split("IMAGINE_TRIGGER:");
-        const textBeforeTrigger = parts[0].replace(/IMAGINE_TRIGGER:/gi, "").trim();
+      if (rawReply.includes("IMAGINE_TRIGGER:")) {  
+        const parts = rawReply.split("IMAGINE_TRIGGER:");
+        const textBeforeTrigger = cleanText(parts[0].replace(/IMAGINE_TRIGGER:/gi, ""));
         const imagePrompt = parts[1].trim();  
         
         const responseStream = await axios.get(imagine(imagePrompt), { responseType: "stream" });
@@ -528,6 +523,12 @@ module.exports = {
           attachment: responseStream.data  
         }, event.messageID);  
       }  
+
+      const clean = cleanText(rawReply);
+      mem.history.push({ sender: "bot", text: clean, time: now });
+      mem.history = mem.history.filter(h => now - h.time <= MEMORY_TIME);  
+      if (mem.history.length > 400) mem.history.shift();  
+      setMem(uid, mem);  
 
       return message.reply(frame(stylize(clean)), event.messageID);  
 
