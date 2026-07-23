@@ -4,7 +4,6 @@ const path = require('path');
 
 const { commands, aliases } = global.GoatBot;
 
-// Fonction de conversion en petites capitales stylisées
 function toSmallCaps(text) {
   const smallCapsMap = {
     a:'ᴀ', b:'ʙ', c:'ᴄ', d:'ᴅ', e:'ᴇ', f:'ꜰ', g:'ɢ', h:'ʜ', i:'ɪ', j:'ᴊ',
@@ -18,7 +17,6 @@ function toSmallCaps(text) {
   return text.split('').map(c => smallCapsMap[c] || c).join('');
 }
 
-// Fonction utilitaire pour convertir du texte normal en alphabet cursif chic
 function toCursive(text) {
   const cursiveMap = {
     'a': '𝒂', 'b': '𝒃', 'c': '𝒄', 'd': '𝒅', 'e': '𝒆', 'f': '𝒇', 'g': '𝒈', 'h': '𝒉', 'i': '𝒊', 'j': '𝒋', 'k': '𝒌', 'l': '𝒍', 'm': '𝒎', 'n': '𝒏', 'o': '𝒐', 'p': '𝒑', 'q': '𝒒', 'r': '𝒓', 's': '𝒔', 't': '𝒕', 'u': '𝒖', 'v': '𝒗', 'w': '𝒘', 'x': '𝒙', 'y': '𝒚', 'z': '𝒛',
@@ -28,15 +26,13 @@ function toCursive(text) {
   return text.split('').map(c => cursiveMap[c] || c).join('');
 }
 
-// Fonction utilitaire pour générer une couleur HEX aléatoire et lumineuse
 function getRandomNeonColor() {
-  const hues = [0, 30, 60, 120, 180, 200, 270, 300, 330]; // Sélection de teintes vives
+  const hues = [0, 30, 60, 120, 180, 200, 270, 300, 330];
   const randomHue = hues[Math.floor(Math.random() * hues.length)];
   return `hsl(${randomHue}, 100%, 60%)`;
 }
 
-// === CANVAS : ABSOLUMENT INCHANGÉ ===
-async function generateHelpCanvas(userId, userName, categories) {
+async function generateHelpCanvas(userId, userName, categories, page = 1) {
   const allFlattened = [];
   
   Object.keys(categories).sort().forEach(cat => {
@@ -48,13 +44,19 @@ async function generateHelpCanvas(userId, userName, categories) {
     });
   });
 
+  const maxItemsPerPage = 80;
+  const totalPages = Math.ceil(allFlattened.length / maxItemsPerPage) || 1;
+  const currentPage = Math.min(Math.max(1, page), totalPages);
+  
+  const pageItems = allFlattened.slice((currentPage - 1) * maxItemsPerPage, currentPage * maxItemsPerPage);
+
   const startY = 160;
   const lineHeight = 24;
   const colWidth = 250; 
   const startX = 40;
   
   const columnsCount = 4;
-  const itemsPerCol = Math.ceil(allFlattened.length / columnsCount);
+  const itemsPerCol = Math.ceil(pageItems.length / columnsCount);
   const contentHeight = itemsPerCol * lineHeight;
   
   const canvasWidth = (columnsCount * colWidth) + (startX * 2);
@@ -111,7 +113,7 @@ async function generateHelpCanvas(userId, userName, categories) {
   ctx.fillStyle = '#ffffff'; 
   ctx.font = '13px "Sans-Serif"';
   const cleanName = userName.length > 20 ? userName.substring(0, 20) + "..." : userName;
-  ctx.fillText(`USER // ${cleanName.toUpperCase()} | ONLINE COMMANDS: ${allFlattened.filter(i => i.type === 'cmd').length}`, 135, 90);
+  ctx.fillText(`USER // ${cleanName.toUpperCase()} | COMMANDS: ${allFlattened.filter(i => i.type === 'cmd').length} | PAGE [${currentPage}/${totalPages}]`, 135, 90);
 
   ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)'; 
   ctx.lineWidth = 1;
@@ -128,7 +130,7 @@ async function generateHelpCanvas(userId, userName, categories) {
     ctx.stroke();
   }
 
-  allFlattened.forEach((item, index) => {
+  pageItems.forEach((item, index) => {
     const col = Math.floor(index / itemsPerCol);
     const row = index % itemsPerCol;
     const x = startX + (col * colWidth);
@@ -155,24 +157,61 @@ async function generateHelpCanvas(userId, userName, categories) {
   await fs.ensureDir(tmpDir);
   const imagePath = path.join(tmpDir, `premium_photo_${Date.now()}_${userId}.png`);
   fs.writeFileSync(imagePath, canvas.toBuffer('image/png'));
-  return imagePath;
+  return { imagePath, currentPage, totalPages };
 }
 
 module.exports = {
   config: {
     name: "help",
-    version: "19.15",
+    version: "20.00",
     author: "Christus x Célestin 🔥",
     countDown: 2,
     role: 0,
-    shortDescription: { en: "Indexation au format carré avec couleurs dynamiques aléatoires." },
+    shortDescription: { en: "Indexation dynamique avec support de pagination." },
     category: "info",
-    guide: { en: "help [all]" },
+    guide: { en: "help [page/commande/all]" },
   },
 
-  onReply: async function ({ message, event }) {
+  onReply: async function ({ message, event, usersData }) {
     try {
-      const targetCmd = event.body.trim().toLowerCase();
+      if (event.senderID !== this.onReplyData?.author && this.onReplyData?.author) return;
+
+      const input = event.body.trim().toLowerCase();
+
+      // Gestion du changement de page via reply
+      if (input.startsWith("page ") || !isNaN(input)) {
+        const pageNum = parseInt(input.replace("page ", "")) || 1;
+        const uid = event.senderID;
+        const userName = await usersData.getName(uid);
+
+        const categories = {};
+        for (let [name, cmd] of commands) {
+          const cat = cmd.config.category || "Autres";
+          if (!categories[cat]) categories[cat] = [];
+          categories[cat].push(name);
+        }
+
+        const { imagePath, currentPage, totalPages } = await generateHelpCanvas(uid, userName, categories, pageNum);
+
+        const res = await message.reply({
+          body: `✨ Page ${currentPage}/${totalPages}\n\n💡 Répondez avec un nom de module ou 'page <numéro>'.`,
+          attachment: fs.createReadStream(imagePath)
+        });
+
+        setTimeout(() => {
+          if (fs.existsSync(imagePath)) fs.unlinkSync(imagePath);
+        }, 5000);
+
+        global.GoatBot.onReply.set(res.messageID, {
+          commandName: this.config.name,
+          messageID: res.messageID,
+          author: uid
+        });
+        return;
+      }
+
+      // Recherche directe d'une commande
+      const targetCmd = input;
       const checkCmd = commands.get(targetCmd) || commands.get(aliases.get(targetCmd));
 
       if (checkCmd) {
@@ -181,20 +220,14 @@ module.exports = {
 🌐 [ ᴄᴏɴꜰɪɢᴜʀᴀᴛɪᴏɴ ѕʏѕᴛᴇᴍ // ${cfg.name.toUpperCase()} ]
 ──────────────────────────────
 🔹 𝖭𝗈𝗆 : ${toSmallCaps(cfg.name)}
-🔹 𝖢𝗋ᴇ́𝖺ᴛ𝖾𝗎𝑟 : ${cfg.author || "Inconnu"}
+🔹 𝖢𝗋ᴇ́𝖺ᴛ𝖾𝗎𝗋 : ${cfg.author || "Inconnu"}
 🔹 𝖣𝖾𝗌𝖼𝗋𝗂𝗉ᴛɪᴏ̂ɴ : ${cfg.description?.en || cfg.shortDescription?.en || "Aucune description"}
 🔹 𝖢𝖺𝗍ᴇ́ɢᴏʀɪᴇ : ${toSmallCaps(cfg.category || "info")}
 🔹 𝖢ᴏᴏʟ... 𝖣𝗈𝗐𝗇 : ${cfg.countDown || 0}s
 🔹 𝖭𝗂𝗏ᴇᴀᴜ 𝖱ᴏ𝒍𝒆 : ${cfg.role === 2 ? "Owner" : cfg.role === 1 ? "Admin" : "Membres"}
 ──────────────────────────────`;
         
-        const res = await message.reply(replyMsg);
-        global.GoatBot.onReply.set(res.messageID, {
-          commandName: this.config.name,
-          messageID: res.messageID,
-          author: event.senderID
-        });
-        return;
+        return message.reply(replyMsg);
       }
     } catch (err) {
       console.error(err);
@@ -215,17 +248,24 @@ module.exports = {
         totalCmds++;
       }
 
-      // === SECTOR RESTRUCTURÉ : MENU "HELP ALL" REVISITÉ ===
+      // Mode texte "help all" avec support de page (ex: .help all 2)
       if (args[0] && args[0].toLowerCase() === "all") {
-        let textList = `╔═══━━━─── • ───━━━═══╗\n        👑 𝐌𝐄𝐍𝐔 𝐏𝐑𝐄𝐌𝐈𝐔𝐌 👑\n╚═══━━━─── • ───━━━═══╝\n\n📊 Modules actifs : ${totalCmds}\n━━━━━━━━━━━━━━━━━━━━━━━`;
+        const pageArg = parseInt(args[1]) || 1;
+        const perPage = 30;
+        const catKeys = Object.keys(categories).sort();
+        const totalTextPages = Math.ceil(catKeys.length / 5) || 1;
+        const currentTextPage = Math.min(Math.max(1, pageArg), totalTextPages);
+
+        let textList = `╔═══━━━─── • ───━━━═══╗\n        👑 𝐌𝐄𝐍𝐔 𝐏𝐑𝐄𝐌𝐈𝐔𝐌 👑\n╚═══━━━─── • ───━━━═══╝\n\n📊 Modules actifs : ${totalCmds} | Page : ${currentTextPage}/${totalTextPages}\n━━━━━━━━━━━━━━━━━━━━━━━`;
         
-        for (const cat of Object.keys(categories).sort()) {
+        const pageCats = catKeys.slice((currentTextPage - 1) * 5, currentTextPage * 5);
+
+        for (const cat of pageCats) {
           textList += `\n\n⚜️ 𝐀${toCursive(cat.substring(1).toUpperCase())}\n`;
           
           const sortedCmds = categories[cat].sort();
           const styledCmds = sortedCmds.map(cmd => `• ${toCursive(cmd)}`);
           
-          // Organisation des commandes sur des lignes de 3 éléments pour correspondre à ton design
           let lineBuffer = [];
           for (let i = 0; i < styledCmds.length; i++) {
             lineBuffer.push(styledCmds[i]);
@@ -235,7 +275,7 @@ module.exports = {
             }
           }
         }
-        textList += `\n\n━━━━━━━━━━━━━━━━━━━━━━━\n💡 Tape une commande pour voir les détails`;
+        textList += `\n\n━━━━━━━━━━━━━━━━━━━━━━━\n💡 Tape '.help all <page>' pour naviguer.`;
 
         const res = await message.reply(textList);
         global.GoatBot.onReply.set(res.messageID, {
@@ -246,7 +286,8 @@ module.exports = {
         return;
       }
 
-      if (args[0]) {
+      // Recherche directe d'une commande passée en argument
+      if (args[0] && isNaN(args[0])) {
         const checkCmd = commands.get(args[0].toLowerCase()) || commands.get(aliases.get(args[0].toLowerCase()));
         if (checkCmd) {
           const cfg = checkCmd.config;
@@ -254,7 +295,7 @@ module.exports = {
 🌐 [ ᴄᴏɴꜰɪɢᴜʀᴀᴛɪᴏɴ ѕʏѕᴛᴇᴍ // ${cfg.name.toUpperCase()} ]
 ──────────────────────────────
 🔹 𝖭𝗈𝗆 : ${toSmallCaps(cfg.name)}
-🔹 𝖢𝗋ᴇ́𝖺ᴛ𝖾𝗎𝑟 : ${cfg.author || "Inconnu"}
+🔹 𝖢𝗋ᴇ́𝖺ᴛ𝖾𝗎𝗋 : ${cfg.author || "Inconnu"}
 🔹 𝖣𝖾𝗌𝖼𝗋𝗂𝗉ᴛɪᴏ̂ɴ : ${cfg.description?.en || cfg.shortDescription?.en || "Aucune description"}
 🔹 𝖢𝖺𝗍ᴇ́ɢᴏʀɪᴇ : ${toSmallCaps(cfg.category || "info")}
 🔹 𝖢ᴏᴏʟ... 𝖣𝗈𝗐𝗇 : ${cfg.countDown || 0}s
@@ -264,10 +305,13 @@ module.exports = {
         }
       }
 
-      const imagePath = await generateHelpCanvas(uid, userName, categories);
+      // Page numérique directement passée en argument (ex: .help 2)
+      const requestedPage = parseInt(args[0]) || 1;
+
+      const { imagePath, currentPage, totalPages } = await generateHelpCanvas(uid, userName, categories, requestedPage);
 
       const res = await message.reply({
-        body: "✨ Répondez à cette image avec le nom d'un module pour ouvrir ses configurations.\n\n📱 *Mode Basique :* Utilisez la commande `.help all` si l'image ne charge pas.",
+        body: `✨ Page ${currentPage}/${totalPages} - Répondez à ce message avec le nom d'un module pour voir les détails ou tapez 'page ${currentPage + 1}' pour la suite.\n\n📱 *Mode Basique :* Utilisez la commande '.help all' si l'image ne charge pas.`,
         attachment: fs.createReadStream(imagePath)
       });
 
@@ -286,4 +330,3 @@ module.exports = {
     }
   }
 };
-    
